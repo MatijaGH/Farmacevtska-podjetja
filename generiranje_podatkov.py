@@ -1,6 +1,7 @@
-pip install auth
 import auth
-auth.db = "banka2019_uporabnik" % auth.user
+import csv
+import pandas as pd
+auth.db = "sem2019_%s" % auth.user
 # uvozimo psycopg2
 import psycopg2, psycopg2.extensions, psycopg2.extras
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE) # se znebimo problemov s šumniki
