@@ -7,7 +7,11 @@ import pandas as pd
 import psycopg2, psycopg2.extensions, psycopg2.extras
 
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE) # se znebimo problemov s šumniki
-
+ 
+#priklop na bazo
+conn = psycopg2.connect(database=auth.db, host=auth.host, user=auth.user, password=auth.password)
+conn.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
+cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
 #Preberemo lahko podatke, ki jih imamo
 
@@ -33,7 +37,7 @@ klub = pd.read_csv('Podatki/klub.csv', encoding = "ISO-8859-1",
                    header=None,
                    names=['ID','Ime','Naslov'],
                    sep = ',')
-testigralci = list(igralci.ID)
+testklub = list(klub.ID)
 ###########
 
 sportni_direktor = pd.read_csv('Podatki/sportni_direktor.csv', encoding = "ISO-8859-1",
@@ -41,40 +45,40 @@ sportni_direktor = pd.read_csv('Podatki/sportni_direktor.csv', encoding = "ISO-8
                    header=None,
                    names=['ID', 'Ime', 'Priimek'],
                    sep = ',')
-testsportni_direktor = list(sportni_direktor.ID)
+testsportni_direktor = list(sportni_direktor.Ime)
 
 #USTVARJANJE TABEL
-#Kasnjeje bom malo spremenil zadeve, da bodo še foreign key v redu
+#Kasneje bom malo spremenil zadeve, da bodo še foreign key v redu
 
 def ustvari_tabelo_agent():
     cur.execute("""
         CREATE TABLE agent (
             id SERIAL PRIMARY KEY,
             ime TEXT NOT NULL,
-            priimek TEXT NOT NULL,
+            priimek TEXT NOT NULL
         );
     """)
-conn.commit()
-
+    conn.commit()
+####
 def ustvari_tabelo_sportni_direktor():
     cur.execute("""
         CREATE TABLE sportni_direktor (
             id SERIAL PRIMARY KEY,
             ime TEXT NOT NULL,
-            priimek TEXTNOT NULL,
+            priimek TEXT NOT NULL
         );
     """)
-conn.commit()
+    conn.commit()
 
 def ustvari_tabelo_klub():
     cur.execute("""
         CREATE TABLE klub (
             id SERIAL PRIMARY KEY,
             ime TEXT NOT NULL,
-            naslov TEXT NOT NULL,
+            naslov TEXT NOT NULL
         );
     """)
-conn.commit()
+    conn.commit()
 
 #Ukazi za brisanje tabel
 
@@ -82,19 +86,19 @@ def pobrisi_tabelo_agent():
     cur.execute("""
         DROP TABLE agent;
     """)
-conn.commit()
+    conn.commit()
 
 def pobrisi_tabelo_sportni_direktor():
     cur.execute("""
         DROP TABLE sportni_direktor;
     """)
-conn.commit()
+    conn.commit()
 
 def pobrisi_klub():
     cur.execute("""
         DROP TABLE klub;
     """)
-conn.commit()
+    conn.commit()
 
 #Ukazi za uvažanje podatkov
 
@@ -106,13 +110,13 @@ def uvozi_podatke_agent():
             r = [None if x in ('', '-') else x for x in r]
             cur.execute("""
                 INSERT INTO agent
-                (ID, Ime,Priimek)
-                VALUES (%d,%s ,%s)
-                RETURNING ID
+                (id, ime, priimek)
+                VALUES (%s, %s ,%s)
+                RETURNING id
             """, r)
             rid, = cur.fetchone()
             print("Uvožen agent %s z ID-jem %d" % (r[0], rid))
-conn.commit()
+    conn.commit()
 
 def uvozi_podatke_igralci():
     with open("Podatki/igralci.csv") as f:
@@ -129,7 +133,7 @@ def uvozi_podatke_igralci():
             """, r)
             rid, = cur.fetchone()
             print("Uvožen igralec %s z ID-jem %d" % (r[0], rid))
-conn.commit()
+    conn.commit()
 
 def uvozi_podatke_klubi():
     with open("Podatki/klub.csv") as f:
@@ -145,7 +149,7 @@ def uvozi_podatke_klubi():
             """, r)
             rid, = cur.fetchone()
             print("Uvožen klub %s z ID-jem %d" % (r[0], rid))
-conn.commit()
+    conn.commit()
 
 def uvozi_podatke_sportni_direktor():
     with open("Podatki/klub.csv") as f:
@@ -161,7 +165,7 @@ def uvozi_podatke_sportni_direktor():
             """, r)
             rid, = cur.fetchone()
             print("Uvožen sportni direktor %s z ID-jem %d" % (r[0], rid))
-conn.commit()
+    conn.commit()
 
 #Test, ali vse deluje, kot mora
 
@@ -169,7 +173,6 @@ def test():
     cur.execute("select * from agent")
     print(cur.fetchall())
     
-conn = psycopg2.connect(database=auth.db, host=auth.host, user=auth.user, password=auth.password)
-conn.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
-cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor) 
+
+
 test()
