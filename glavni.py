@@ -1,3 +1,4 @@
+import bottle
 from bottle import *
 import auth as auth
 import psycopg2, psycopg2.extensions, psycopg2.extras
@@ -9,6 +10,10 @@ psycopg2.extensions.register_type(psycopg2.extensions.UNICODE) #da imamo lahko s
 baza = psycopg2.connect(database=auth.db, host=auth.host, user=auth.user, password=auth.password)
 baza.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT) # onemogocimo transakcije
 cur = baza.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+bottle.TEMPLATE_PATH.insert(0,"./CoolAdmin-master")
+                            
+
 
 ################
 #test priklopa na bazo(ni še v redu, popraviti moram program za tabelo)
@@ -23,7 +28,10 @@ print(test(3))
 ################
 #bottle uvod, pomozne funkcije
 
-def pooblastilo(user):
+static_dir = "./static"
+secret = "to skrivnost je zelo tezko uganiti 1094107c907cw982982c42"
+
+def vloga(user):
     cur.execute("SELECT pooblastilo FROM uporabnik WHERE username=%s",
               [user])
     r = cur.fetchone()[0]
@@ -37,7 +45,7 @@ def password_md5(s):
     h.update(s.encode('utf-8'))
     return h.hexdigest()
 
-print(password_md5("mat555"))
+print(password_md5("psimonds0"))
 
 def get_user(auto_login = True, auto_redir=False):
     """Poglej cookie in ugotovi, kdo je prijavljeni uporabnik,
@@ -68,19 +76,19 @@ def get_user(auto_login = True, auto_redir=False):
 
 
 #tukaj bo potrebno narediti še strani, kamor želimo preusmerjati in pogledati, kaj točno so parametri
-def preusmeri(parameter, pooblastilo):
-    if parameter == "agent":
-        redirect('/indexagent/')
-    elif parameter == "sportni_direktor":
-        redirect('/indexsportni_direktor/')
-    elif parameter == 'raziskovalec':
-        if pooblastilo == 'zdravnik':
-            redirect('/index/')
-        elif pooblastilo == 'direktor':
-redirect('/indexdirektor/')
+##def preusmeri(parameter, pooblastilo):
+##    if parameter == "agent":
+##        redirect('/indexagent/')
+##    elif parameter == "sportni_direktor":
+##        redirect('/indexsportni_direktor/')
+##    elif parameter == 'raziskovalec':
+##        if pooblastilo == 'zdravnik':
+##            redirect('/index/')
+##        elif pooblastilo == 'direktor':
+##    redirect('/indexdirektor/')
 
 
-@route("/static/<filename:path>")
+@route("/CoolAdmin-master/<filename:path>")
 def static(filename):
     """Splosna funkcija, ki servira vse staticne datoteke iz naslova
        /static/..."""
@@ -130,12 +138,12 @@ def login_post():
                             username=username)
     else:
         response.set_cookie('username', username, path='/', secret=secret)
-        if tmp[2] == 'zdravnik':
+        if tmp[2] == 'igralec':
             redirect('/index/')
-        elif tmp[2] == 'raziskovalec':
-            redirect("/indexraziskovalec/")
+        elif tmp[2] == 'agent':
+            redirect("/index3/")
         else:
-            redirect("/indexdirektor/")
+            redirect("/index2/")
 
 
 # else:
