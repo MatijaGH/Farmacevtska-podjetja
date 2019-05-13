@@ -65,3 +65,83 @@ def get_user(auto_login = True, auto_redir=False):
         redirect('/login/')
     else:
         return None
+
+
+#tukaj bo potrebno narediti še strani, kamor želimo preusmerjati in pogledati, kaj točno so parametri
+def preusmeri(parameter, pooblastilo):
+    if parameter == "agent":
+        redirect('/indexagent/')
+    elif parameter == "sportni_direktor":
+        redirect('/indexsportni_direktor/')
+    elif parameter == 'raziskovalec':
+        if pooblastilo == 'zdravnik':
+            redirect('/index/')
+        elif pooblastilo == 'direktor':
+redirect('/indexdirektor/')
+
+
+@route("/static/<filename:path>")
+def static(filename):
+    """Splosna funkcija, ki servira vse staticne datoteke iz naslova
+       /static/..."""
+    return static_file(filename, root=static_dir)
+
+
+################
+#bottle routes
+@get("/login/")
+def login_get():
+    """Serviraj formo za login."""
+    curuser = get_user(auto_login = False, auto_redir = True)
+    return template("login.html",
+                           napaka=None,
+                           username=None)
+
+@post("/login/")
+def login_post():
+    """Obdelaj izpolnjeno formo za prijavo"""
+    # Uporabnisko ime, ki ga je uporabnik vpisal v formo
+    username = request.forms.username
+    # Izracunamo MD5 has gesla, ki ga bomo spravili
+    password = password_md5(request.forms.password)
+    # Preverimo, ali se je uporabnik pravilno prijavil
+    c = baza.cursor()
+    c.execute("SELECT * FROM uporabnik WHERE username=%s AND hash=%s",
+              [username, password])
+    tmp = c.fetchone()
+    # preverimo, ali je zahtevek mogoce v cakanju
+    c2 = baza.cursor()
+    c2.execute("SELECT * FROM zahtevek WHERE username=%s AND hash=%s",
+              [username, password])
+    tmp2 = c2.fetchone()
+    print(tmp2)
+    if tmp is None:
+        if tmp2 is None:
+            return template("login.html",
+                                   napaka="Nepravilna prijava",
+                                   username=username)
+        elif tmp2[7] == True:
+            return template("login.html",
+                            napaka="Nepravilna prijava",
+                            username=username)
+        else:
+            return template("login.html",
+                            napaka="Zahtevek registracije je v cakanju.",
+                            username=username)
+    else:
+        response.set_cookie('username', username, path='/', secret=secret)
+        if tmp[2] == 'zdravnik':
+            redirect('/index/')
+        elif tmp[2] == 'raziskovalec':
+            redirect("/indexraziskovalec/")
+        else:
+            redirect("/indexdirektor/")
+
+
+# else:
+# Vse je v redu, nastavimo cookie in preusmerimo na glavno stran
+#     response.set_cookie('username', username, path='/', secret=secret)
+#     redirect("/index/")
+
+
+run(host='localhost', port=8080)
