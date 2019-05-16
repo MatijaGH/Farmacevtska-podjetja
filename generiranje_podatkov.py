@@ -27,7 +27,7 @@ igralci = pd.read_csv('Podatki/igralci.csv', encoding = "ISO-8859-1",
                    error_bad_lines=False,
                    header=None,
                    names=['ID', 'Ime', 'Priimek','Država','Plača','Datum_rojstva',''
-                          ,'','','vrednost'],
+                          ,'','','vrednost','klub','agent'],
                    sep = ',')
 testigralci = list(igralci.ID)
 ###########
@@ -40,15 +40,8 @@ klub = pd.read_csv('Podatki/klub.csv', encoding = "ISO-8859-1",
 testklub = list(klub.ID)
 ###########
 
-sportni_direktor = pd.read_csv('Podatki/sportni_direktor.csv', encoding = "ISO-8859-1",
-                   error_bad_lines=False,
-                   header=None,
-                   names=['ID', 'Ime', 'Priimek'],
-                   sep = ',')
-testsportni_direktor = list(sportni_direktor.Ime)
 
 #USTVARJANJE TABEL
-#Kasneje bom malo spremenil zadeve, da bodo še foreign key v redu
 
 def ustvari_tabelo_agent():
     cur.execute("""
@@ -60,15 +53,7 @@ def ustvari_tabelo_agent():
     """)
     conn.commit()
 ####
-def ustvari_tabelo_sportni_direktor():
-    cur.execute("""
-        CREATE TABLE sportni_direktor (
-            id SERIAL PRIMARY KEY,
-            ime TEXT NOT NULL,
-            priimek TEXT NOT NULL
-        );
-    """)
-    conn.commit()
+
 
 def ustvari_tabelo_klub():
     cur.execute("""
@@ -80,6 +65,36 @@ def ustvari_tabelo_klub():
     """)
     conn.commit()
 
+def ustvari_tabelo_prestop():
+    cur.execute("""
+        CREATE TABLE prestop (
+            id SERIAL PRIMARY KEY,
+            cena INT,
+            datum DATE,
+            stanje BOOLEAN,
+            igralec FOREIGN KEY REFERENCES igralec,
+            iz_kluba FOREIGN KEY REFERENCES klub,
+            v_klub FOREIGN KEY REFERENCES klub,
+            agent FOREIGN KEY REFERENCES agent
+        );
+    """)
+    conn.commit()
+
+def ustvari_tabelo_igralci():
+    cur.execute("""
+        CREAT TABLE igralci (
+            id SERIAL PRIMARY KEY,
+            ime VARCHAR(50),
+            priimek VARCHAR(50),
+            država VARCHAR(50),
+            plača INT,
+            vrednost INT,
+            klub REFERENCES FOREIGN KEY klub,
+            agent REFERENCES FOREIGN KEY agent
+        );
+    """)
+    conn.commit()
+    
 #Ukazi za brisanje tabel
 
 def pobrisi_tabelo_agent():
@@ -88,15 +103,22 @@ def pobrisi_tabelo_agent():
     """)
     conn.commit()
 
-def pobrisi_tabelo_sportni_direktor():
+
+def pobrisi_tabelo_klub():
     cur.execute("""
-        DROP TABLE sportni_direktor;
+        DROP TABLE klub;
     """)
     conn.commit()
 
-def pobrisi_klub():
+def pobrisi_tabelo_prestop():
     cur.execute("""
-        DROP TABLE klub;
+        DROP TABLE prestop;
+    """)
+    conn.commit()
+
+def pobrisi_tabelo_igralci():
+    cur.execute("""
+        DROP TABLE igralci;
     """)
     conn.commit()
 
@@ -127,8 +149,8 @@ def uvozi_podatke_igralci():
             cur.execute("""
                 INSERT INTO igralci
                 (ID,Ime,Priimek,Država,Plača,Datum_rojstva,
-                          ,,,vrednost)
-                VALUES (%d, %s, %s, %s, %s,%d%d%d, %d, %d, %d,%d)
+                          ,,,vrednost,klub,agent)
+                VALUES (%d, %s, %s, %s, %s,%d%d%d, %d, %d, %d,%d,%s,%s)
                 RETURNING id
             """, r)
             rid, = cur.fetchone()
@@ -151,21 +173,6 @@ def uvozi_podatke_klubi():
             print("Uvožen klub %s z ID-jem %d" % (r[0], rid))
     conn.commit()
 
-def uvozi_podatke_sportni_direktor():
-    with open("Podatki/klub.csv") as f:
-        rd = csv.reader(f)
-        next(rd) 
-        for r in rd:
-            r = [None if x in ('', '-') else x for x in r]
-            cur.execute("""
-                INSERT INTO sportni_direktor
-                (ID,Ime, Priimek)
-                VALUES (%d,%s,%s)
-                RETURNING id
-            """, r)
-            rid, = cur.fetchone()
-            print("Uvožen sportni direktor %s z ID-jem %d" % (r[0], rid))
-    conn.commit()
 
 #Test, ali vse deluje, kot mora
 
