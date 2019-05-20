@@ -94,7 +94,21 @@ def ustvari_tabelo_igralci():
         );
     """)
     conn.commit()
-    
+
+#Ukazi za dodajanje podatkov v tabelo igralec(klub/agent)
+
+def dodaj_podatke_igralci():
+    for j in range(999):
+        agent = random.choice(podatki/agent.csv.id)
+        klub = random.choice(podatki/klub.csv.id)
+        cur.execute("""
+                INSERT INTO igralci
+                (agent, klub)
+                VALUES (%d, %d)
+                RETURNING id
+            """)
+    conn.commit()
+
 #Ukazi za brisanje tabel
 
 def pobrisi_tabelo_agent():

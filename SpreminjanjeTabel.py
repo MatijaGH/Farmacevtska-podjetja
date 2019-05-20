@@ -15,13 +15,55 @@
 def predlagaj_prestop():
     cur.execute("""
         INSERT INTO prestop
-        (cena, datum, potrjen)
-        VALUES (%d, '%s', 'FALSE')
+        (id_igralec, cena, datum, potrjen)
+        VALUES (%d, %d, '%s', 'FALSE')
         RETURNING id
-        """,)
+        """, r)
     rid, = cur.fetchone()
     print("Uvožen prestop %s z ID-jem %d" % (r[0], rid))
     conn.commit()
 
-def potrjevanje_prestopa(potrjen):
+def potrjevanje_prestopa(potrdilo):
+    cur.execute("""
+        UPDATE prestop SET potrjen = potrdilo
+        WHERE potrdilo = %s
+        """, r)
+    rid, = cur.fetchone()
+    print("Potrjen prestop %s z ID-jem  %d" % (r[0], rid))
+    conn.commit()
+
+def posodobitev_podatkov_igralec(nova_plača, nova_vrednost, nov_klub):
+    cur.execute("""
+        UPDATE igralec SET plača = nova_plača, vrednost = nova_vrednost, klub = nov_klub
+        WHERE nova_plača = %d, nova_vrednost = %d, nov_klub = %s
+        """, r)
+    rid, = cur.fetchone()
+    print("Spremeba podatkov igralca %s z ID-jem  %d" % (r[0], rid))
+    conn.commit()
+
+
+def zamenjaj_agenta(nov_agent):
+    cur.execute("""
+        UPDATE igralec SET agent = nov_agent
+        WHERE nov_agent = %s
+        """, r)
+    rid, = cur.fetchone()
+    print("Agent %s z ID-jem  %d" % (r[0], rid))
+    conn.commit()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
