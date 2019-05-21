@@ -1,13 +1,14 @@
 import bottle
 from bottle import *
-import auth_public as auth
+#import auth as auth
 import psycopg2, psycopg2.extensions, psycopg2.extras
 import hashlib
 import webbrowser
 
 #priklop na bazo
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE) #da imamo lahko sumnike
-baza = psycopg2.connect(database=auth.db, host=auth.host, user=auth.user, password=auth.password)
+baza = psycopg2.connect(database='sem2019_matijagh', host='baza.fmf.uni-lj.si', user='matijagh', password='f3wl64em')
+#baza = psycopg2.connect(database=auth.db, host=auth.host, user=auth.user, password=auth.password)
 baza.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT) # onemogocimo transakcije
 cur = baza.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
@@ -109,6 +110,11 @@ def login_get():
 def index_get():
     """Serviraj formo za index1."""
     return template("index.html")
+
+@get("/form/")
+def index_get():
+    """Serviraj formo za index1."""
+    return template("form.html")
 
 @post('/login/', method='post')
 def do_login():
