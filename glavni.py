@@ -1,6 +1,6 @@
 import bottle
 from bottle import *
-import auth as auth
+import auth_public as auth
 import psycopg2, psycopg2.extensions, psycopg2.extras
 import hashlib
 import webbrowser
@@ -11,7 +11,7 @@ baza = psycopg2.connect(database=auth.db, host=auth.host, user=auth.user, passwo
 baza.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT) # onemogocimo transakcije
 cur = baza.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-bottle.TEMPLATE_PATH.insert(0,"./CoolAdmin-master")
+#bottle.TEMPLATE_PATH.insert(0,"./CoolAdmin-master")
                             
 
 
@@ -88,7 +88,7 @@ def get_user(auto_login = True, auto_redir=False):
 ##    redirect('/indexdirektor/')
 
 
-@route("/CoolAdmin-master/<filename:path>")
+@route("/static/<filename:path>")
 def static(filename):
     """Splosna funkcija, ki servira vse staticne datoteke iz naslova
        /static/..."""
@@ -105,13 +105,18 @@ def login_get():
                            napaka=None,
                            username=None)
 
-@post("/login/")
-def login_post():
+@get("/index/")
+def index_get():
+    """Serviraj formo za index1."""
+    return template("index.html")
+
+@post('/login/', method='post')
+def do_login():
     """Obdelaj izpolnjeno formo za prijavo"""
     # Uporabnisko ime, ki ga je uporabnik vpisal v formo
-    username = request.forms.username
+    username = request.forms.get('username')
     # Izracunamo MD5 has gesla, ki ga bomo spravili
-    password = password_md5(request.forms.password)
+    password = password_md5(request.forms.get('password'))
     # Preverimo, ali se je uporabnik pravilno prijavil
     c = baza.cursor()
     c.execute("SELECT * FROM uporabnik WHERE username=%s AND hash=%s",
