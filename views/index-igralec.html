@@ -171,7 +171,7 @@
                     </ul>
                     <ul class="list-unstyled navbar__list">
                         <li class="has-sub">
-                            <a class="js-arrow" href="/form/">
+                            <a class="js-arrow" href="/prestopi/">
                                 <i class="fas fa-balance-scale"></i>Ponudbe</a>
                         </li>
                     </ul>
@@ -188,7 +188,7 @@
                     <div class="container-fluid">
                         <div class="header-wrap">
                             <form class="form-header" action="" method="POST">
-                                <input class="au-input au-input--xl" type="text" name="search" placeholder="Search for datas &amp; reports..." />
+                                <input class="au-input au-input--xl" type="text" name="search" placeholder="Išči igralce, agente, klube..." />
                                 <button class="au-btn--submit" type="submit">
                                     <i class="zmdi zmdi-search"></i>
                                 </button>
@@ -238,7 +238,7 @@
                                 <div class="account-wrap">
                                     <div class="account-item clearfix js-item-menu">
                                         <div class="image">
-                                            <img src="images/icon/avatar-01.jpg" alt="John Doe" />
+                                            <img src="/static/images/icon/circle-512.png" alt="John Doe" style="width:50px"/>
                                         </div>
                                         <div class="content">
                                             <a class="js-acc-btn" href="#">john doe</a>
@@ -246,21 +246,21 @@
                                         <div class="account-dropdown js-dropdown">
                                             <div class="info clearfix">
                                                 <div class="image">
-                                                    <a href="#">
-                                                        <img src="images/icon/avatar-01.jpg" alt="John Doe" />
+                                                    <a href="/index-igralec/">
+                                                        <img src="/static/images/icon/circle-512.png" alt="John Doe" style="width:50px"/>
                                                     </a>
                                                 </div>
                                                 <div class="content">
                                                     <h5 class="name">
-                                                        <a href="#">john doe</a>
+                                                        <a href="/index-igralec/">john doe</a>
                                                     </h5>
                                                     <span class="email">johndoe@example.com</span>
                                                 </div>
                                             </div>
                                     
                                             <div class="account-dropdown__footer">
-                                                <a href="#">
-                                                    <i class="zmdi zmdi-power"></i>Logout</a>
+                                                <a href="/login/">
+                                                    <i class="zmdi zmdi-power"></i>Odjavi se</a>
                                             </div>
                                         </div>
                                     </div>
@@ -284,7 +284,7 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="mx-auto d-block">
-                                        <img class="rounded-circle mx-auto d-block" src="/static/images/icon/avatar-01.jpg" alt="Card image cap">
+                                        <img class="rounded-circle mx-auto d-block" src="/static/images/icon/circle-512.png" alt="Card image cap" style="width:100px">
                                         <h5 class="text-sm-center mt-2 mb-1">Steven Lee</h5>
                                         <div class="location text-sm-center">
                                             <i class="fa fa-map-marker"></i> California, United States</div>
@@ -332,191 +332,6 @@
                             </div>
                 
                                         </div>
-                                        <h3 class="title-5 m-b-35">Ponudbe prestopov</h3>
-                                <div class="table-data__tool">
-                                    <div class="table-data__tool-left">
-                                        <div class="rs-select2--light rs-select2--md">
-                                            <select class="js-select2" name="property">
-                                                <option selected="selected">All Properties</option>
-                                                <option value="">Option 1</option>
-                                                <option value="">Option 2</option>
-                                            </select>
-                                            <div class="dropDownSelect2"></div>
-                                        </div>
-                                        <div class="rs-select2--light rs-select2--sm">
-                                            <select class="js-select2" name="time">
-                                                <option selected="selected">Today</option>
-                                                <option value="">3 Days</option>
-                                                <option value="">1 Week</option>
-                                            </select>
-                                            <div class="dropDownSelect2"></div>
-                                        </div>
-                                        <button class="au-btn-filter">
-                                            <i class="zmdi zmdi-filter-list"></i>filters</button>
-                                    </div>
-                                </div>
-                                <div class="table-responsive table-responsive-data2">
-                                    <table class="table table-data2">
-                                        <thead>
-                                            <tr>
-                                                <th>
-                                                    <label class="au-checkbox">
-                                                        <input type="checkbox">
-                                                        <span class="au-checkmark"></span>
-                                                    </label>
-                                                </th>
-                                                <th>name</th>
-                                                <th>email</th>
-                                                <th>description</th>
-                                                <th>date</th>
-                                                <th>status</th>
-                                                <th>price</th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr class="tr-shadow">
-                                                <td>
-                                                    <label class="au-checkbox">
-                                                        <input type="checkbox">
-                                                        <span class="au-checkmark"></span>
-                                                    </label>
-                                                </td>
-                                                <td>Lori Lynch</td>
-                                                <td>
-                                                    <span class="block-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ed81829f84ad88958c809d8188c38e8280">[email&#160;protected]</a></span>
-                                                </td>
-                                                <td class="desc">Samsung S8 Black</td>
-                                                <td>2018-09-27 02:12</td>
-                                                <td>
-                                                    <span class="status--process">Processed</span>
-                                                </td>
-                                                <td>$679.00</td>
-                                                <td>
-                                                    <div class="table-data-feature">
-                                                        <button class="item" data-toggle="tooltip" data-placement="top" title="Send">
-                                                            <i class="zmdi zmdi-mail-send"></i>
-                                                        </button>
-                                                        <button class="item" data-toggle="tooltip" data-placement="top" title="Edit">
-                                                            <i class="zmdi zmdi-edit"></i>
-                                                        </button>
-                                                        <button class="item" data-toggle="tooltip" data-placement="top" title="Delete">
-                                                            <i class="zmdi zmdi-delete"></i>
-                                                        </button>
-                                                        <button class="item" data-toggle="tooltip" data-placement="top" title="More">
-                                                            <i class="zmdi zmdi-more"></i>
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <tr class="spacer"></tr>
-                                            <tr class="tr-shadow">
-                                                <td>
-                                                    <label class="au-checkbox">
-                                                        <input type="checkbox">
-                                                        <span class="au-checkmark"></span>
-                                                    </label>
-                                                </td>
-                                                <td>Lori Lynch</td>
-                                                <td>
-                                                    <span class="block-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="8ce6e3e4e2cce9f4ede1fce0e9a2efe3e1">[email&#160;protected]</a></span>
-                                                </td>
-                                                <td class="desc">iPhone X 64Gb Grey</td>
-                                                <td>2018-09-29 05:57</td>
-                                                <td>
-                                                    <span class="status--process">Processed</span>
-                                                </td>
-                                                <td>$999.00</td>
-                                                <td>
-                                                    <div class="table-data-feature">
-                                                        <button class="item" data-toggle="tooltip" data-placement="top" title="Send">
-                                                            <i class="zmdi zmdi-mail-send"></i>
-                                                        </button>
-                                                        <button class="item" data-toggle="tooltip" data-placement="top" title="Edit">
-                                                            <i class="zmdi zmdi-edit"></i>
-                                                        </button>
-                                                        <button class="item" data-toggle="tooltip" data-placement="top" title="Delete">
-                                                            <i class="zmdi zmdi-delete"></i>
-                                                        </button>
-                                                        <button class="item" data-toggle="tooltip" data-placement="top" title="More">
-                                                            <i class="zmdi zmdi-more"></i>
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <tr class="spacer"></tr>
-                                            <tr class="tr-shadow">
-                                                <td>
-                                                    <label class="au-checkbox">
-                                                        <input type="checkbox">
-                                                        <span class="au-checkmark"></span>
-                                                    </label>
-                                                </td>
-                                                <td>Lori Lynch</td>
-                                                <td>
-                                                    <span class="block-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="64081d0a24011c05091408014a070b09">[email&#160;protected]</a></span>
-                                                </td>
-                                                <td class="desc">iPhone X 256Gb Black</td>
-                                                <td>2018-09-25 19:03</td>
-                                                <td>
-                                                    <span class="status--denied">Denied</span>
-                                                </td>
-                                                <td>$1199.00</td>
-                                                <td>
-                                                    <div class="table-data-feature">
-                                                        <button class="item" data-toggle="tooltip" data-placement="top" title="Send">
-                                                            <i class="zmdi zmdi-mail-send"></i>
-                                                        </button>
-                                                        <button class="item" data-toggle="tooltip" data-placement="top" title="Edit">
-                                                            <i class="zmdi zmdi-edit"></i>
-                                                        </button>
-                                                        <button class="item" data-toggle="tooltip" data-placement="top" title="Delete">
-                                                            <i class="zmdi zmdi-delete"></i>
-                                                        </button>
-                                                        <button class="item" data-toggle="tooltip" data-placement="top" title="More">
-                                                            <i class="zmdi zmdi-more"></i>
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <tr class="spacer"></tr>
-                                            <tr class="tr-shadow">
-                                                <td>
-                                                    <label class="au-checkbox">
-                                                        <input type="checkbox">
-                                                        <span class="au-checkmark"></span>
-                                                    </label>
-                                                </td>
-                                                <td>Lori Lynch</td>
-                                                <td>
-                                                    <span class="block-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0d6962684d68756c607d6168236e6260">[email&#160;protected]</a></span>
-                                                </td>
-                                                <td class="desc">Camera C430W 4k</td>
-                                                <td>2018-09-24 19:10</td>
-                                                <td>
-                                                    <span class="status--process">Processed</span>
-                                                </td>
-                                                <td>$699.00</td>
-                                                <td>
-                                                    <div class="table-data-feature">
-                                                        <button class="item" data-toggle="tooltip" data-placement="top" title="Send">
-                                                            <i class="zmdi zmdi-mail-send"></i>
-                                                        </button>
-                                                        <button class="item" data-toggle="tooltip" data-placement="top" title="Edit">
-                                                            <i class="zmdi zmdi-edit"></i>
-                                                        </button>
-                                                        <button class="item" data-toggle="tooltip" data-placement="top" title="Delete">
-                                                            <i class="zmdi zmdi-delete"></i>
-                                                        </button>
-                                                        <button class="item" data-toggle="tooltip" data-placement="top" title="More">
-                                                            <i class="zmdi zmdi-more"></i>
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
                                     </div>
                                 </div>
                             </div>
@@ -530,12 +345,9 @@
                         </div>
                     </div>
                 </div>
-            </div>
             <!-- END MAIN CONTENT-->
             <!-- END PAGE CONTAINER-->
-        </div>
-
-    </div>
+        
 
     <!-- Jquery JS-->
     <script src="/static/vendor/jquery-3.2.1.min.js"></script>

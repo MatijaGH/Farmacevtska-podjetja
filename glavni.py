@@ -106,14 +106,33 @@ def login_get():
                            napaka=None,
                            username=None)
 
-@get("/index/")
+@get("/index-agent/")
 def index_get():
     """Serviraj formo za index1."""
-    return template("index.html")
+    return template("index-agent.html")
+
+@get("/index-igralec/")
+def index_get():
+    """Serviraj formo za index1."""
+    return template("index-igralec.html")
+@get("/prestopi/")
+def index_get():
+    """Serviraj formo za index1."""
+    return template("prestopi.html")
+
+@get("/register/")
+def index_get():
+    """Serviraj formo za registracijo"""
+    return template("register.html")
+
+@get("/forget-pass/")
+def index_get():
+    """Serviraj formo za registracijo"""
+    return template("forget-pass.html")
 
 @get("/form/")
-def index_get():
-    """Serviraj formo za index1."""
+def form_get():
+    """Serviraj formo za form"""
     return template("form.html")
 
 @post('/login/', method='post')
@@ -150,9 +169,9 @@ def do_login():
     else:
         response.set_cookie('username', username, path='/', secret=secret)
         if tmp[2] == 'igralec':
-            redirect('/index/')
+            redirect('/index-igralec/')
         elif tmp[2] == 'agent':
-            redirect("/index3/")
+            redirect("/index-agent/")
         else:
             redirect("/index2/")
 
