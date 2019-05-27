@@ -48,9 +48,9 @@ testklub = list(klub.ID)
 def ustvari_tabelo_agent():
     cur.execute("""
         CREATE TABLE agent (
-            id SERIAL PRIMARY KEY,
-            ime TEXT NOT NULL,
-            priimek TEXT NOT NULL
+	    id SERIAL PRIMARY KEY,
+	    ime VARCHAR(50),
+	    priimek VARCHAR(50)
         );
     """)
     conn.commit()
@@ -60,9 +60,26 @@ def ustvari_tabelo_agent():
 def ustvari_tabelo_klub():
     cur.execute("""
         CREATE TABLE klub (
-            id SERIAL PRIMARY KEY,
-            ime TEXT NOT NULL,
-            naslov TEXT NOT NULL
+	    id SERIAL PRIMARY KEY,
+	    Ime VARCHAR(50),
+	    Naslov VARCHAR(50)
+        );
+    """)
+    conn.commit()
+
+def ustvari_tabelo_igralci():
+    cur.execute("""
+        CREATE TABLE igralci (
+	        id SERIAL PRIMARY KEY,
+	        ime VARCHAR(50),
+	        priimek VARCHAR(50),
+	        država VARCHAR(50),
+	        plača INT,
+	        vrednost INT,
+	        klub SERIAL,
+	        agent SERIAL,
+	        FOREIGN KEY (klub) REFERENCES klub (id),
+	        FOREIGN KEY (agent) REFERENCES agent (id)
         );
     """)
     conn.commit()
@@ -70,29 +87,18 @@ def ustvari_tabelo_klub():
 def ustvari_tabelo_prestop():
     cur.execute("""
         CREATE TABLE prestop (
-            id SERIAL PRIMARY KEY,
-            cena INT,
-            datum DATE,
-            stanje BOOLEAN,
-            igralec FOREIGN KEY REFERENCES igralec,
-            iz_kluba FOREIGN KEY REFERENCES klub,
-            v_klub FOREIGN KEY REFERENCES klub,
-            agent FOREIGN KEY REFERENCES agent
-        );
-    """)
-    conn.commit()
-
-def ustvari_tabelo_igralci():
-    cur.execute("""
-        CREAT TABLE igralci (
-            id SERIAL PRIMARY KEY,
-            ime VARCHAR(50),
-            priimek VARCHAR(50),
-            država VARCHAR(50),
-            plača INT,
-            vrednost INT,
-            klub REFERENCES FOREIGN KEY klub,
-            agent REFERENCES FOREIGN KEY agent
+	        id SERIAL PRIMARY KEY,
+	        cena INT,
+	        datum DATE,
+	        stanje BOOLEAN,
+	        igralec SERIAL,
+	        iz_kluba SERIAL,
+	        v_klub SERIAL,
+	        agent SERIAL,
+	        FOREIGN KEY (igralec) REFERENCES igralci (id),
+	        FOREIGN KEY (iz_kluba) REFERENCES klub (id),
+	        FOREIGN KEY (v_klub) REFERENCES klub (id),
+	        FOREIGN KEY (agent) REFERENCES agent(id)
         );
     """)
     conn.commit()
@@ -115,26 +121,26 @@ def dodaj_podatke_igralci():
 
 def pobrisi_tabelo_agent():
     cur.execute("""
-        DROP TABLE agent CASCADE;
+        DROP TABLE IF EXISTS agent CASCADE;
     """)
     conn.commit()
 
 
 def pobrisi_tabelo_klub():
     cur.execute("""
-        DROP TABLE klub CASCADE;
+        DROP TABLE IF EXISTS klub CASCADE;
     """)
     conn.commit()
 
 def pobrisi_tabelo_prestop():
     cur.execute("""
-        DROP TABLE prestop CASCADE;
+        DROP TABLE  IF EXISTS prestop CASCADE;
     """)
     conn.commit()
 
 def pobrisi_tabelo_igralci():
     cur.execute("""
-        DROP TABLE igralci CASCADE;
+        DROP TABLE IF EXISTS igralci CASCADE;
     """)
     conn.commit()
 
@@ -164,9 +170,9 @@ def uvozi_podatke_igralci():
             r = [None if x in ('', '-') else x for x in r]
             cur.execute("""
                 INSERT INTO igralci
-                (ID,Ime,Priimek,Država,Plača,Datum_rojstva,
+                (id,Ime,Priimek,Država,Plača,Datum_rojstva,
                           ,,,vrednost,klub,agent)
-                VALUES (%d, %s, %s, %s, %s,%d%d%d, %d, %d, %d,%d,%s,%s)
+                VALUES (%s, %s, %s, %s, %s,%d%d%d, %d, %d, %d,%d,%s,%s)
                 RETURNING id
             """, r)
             rid, = cur.fetchone()
@@ -181,8 +187,8 @@ def uvozi_podatke_klubi():
             r = [None if x in ('', '-') else x for x in r]
             cur.execute("""
                 INSERT INTO klub
-                (ID,Ime, Naslov)
-                VALUES (%d,%s,%s)
+                (id, ime, naslov)
+                VALUES (%s,%s,%s)
                 RETURNING id
             """, r)
             rid, = cur.fetchone()
@@ -197,5 +203,16 @@ def test():
     print(cur.fetchall())
     
 
+pobrisi_tabelo_agent()
+pobrisi_tabelo_igralci()
+pobrisi_tabelo_klub()
+pobrisi_tabelo_prestop()
+ustvari_tabelo_agent()
+ustvari_tabelo_klub()
+ustvari_tabelo_igralci()
+ustvari_tabelo_prestop()
+uvozi_podatke_agent()
+uvozi_podatke_klubi()
+uvozi_podatke_igralci()
 
 test()
