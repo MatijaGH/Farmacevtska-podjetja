@@ -3,13 +3,15 @@ import csv
 import pandas as pd
 #auth.db = "sem2019_%s" % auth.user
 
+
+
 # uvozimo psycopg2
 import psycopg2, psycopg2.extensions, psycopg2.extras
 
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE) # se znebimo problemov s šumniki
  
 #priklop na bazo
-conn = psycopg2.connect(database=auth.db, host=auth.host, user=auth.user, password=auth.password)
+conn = psycopg2.connect(database='sem2019_matijagh', host='baza.fmf.uni-lj.si', user='matijagh', password='f3wl64em')
 conn.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
 cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
@@ -113,26 +115,26 @@ def dodaj_podatke_igralci():
 
 def pobrisi_tabelo_agent():
     cur.execute("""
-        DROP TABLE agent;
+        DROP TABLE agent CASCADE;
     """)
     conn.commit()
 
 
 def pobrisi_tabelo_klub():
     cur.execute("""
-        DROP TABLE klub;
+        DROP TABLE klub CASCADE;
     """)
     conn.commit()
 
 def pobrisi_tabelo_prestop():
     cur.execute("""
-        DROP TABLE prestop;
+        DROP TABLE prestop CASCADE;
     """)
     conn.commit()
 
 def pobrisi_tabelo_igralci():
     cur.execute("""
-        DROP TABLE igralci;
+        DROP TABLE igralci CASCADE;
     """)
     conn.commit()
 

@@ -1,4 +1,4 @@
-﻿DROP TABLE IF EXISTS igralec CASCADE;
+﻿DROP TABLE IF EXISTS igralci CASCADE;
 DROP TABLE IF EXISTS prestop CASCADE;
 DROP TABLE IF EXISTS klub CASCADE;
 DROP TABLE IF EXISTS agent CASCADE;
@@ -16,27 +16,34 @@ CREATE TABLE klub (
 	Naslov VARCHAR(50)
 );
 
-CREATE TABLE prestop (
-	id SERIAL PRIMARY KEY,
-	cena INT,
-	datum DATE,
-	stanje BOOLEAN,
-	igralec FOREIGN KEY REFERENCES igralec,
-	iz_kluba FOREIGN KEY REFERENCES klub,
-	v_klub FOREIGN KEY REFERENCES klub,
-	agent FOREIGN KEY REFERENCES agent
-);
-
-CREAT TABLE igralci (
+CREATE TABLE igralci (
 	id SERIAL PRIMARY KEY,
 	ime VARCHAR(50),
 	priimek VARCHAR(50),
 	država VARCHAR(50),
 	plača INT,
 	vrednost INT,
-	klub REFERENCES FOREIGN KEY klub,
-	agent REFERENCES FOREIGN KEY agent
+	klub SERIAL,
+	agent SERIAL,
+	FOREIGN KEY (klub) REFERENCES klub (id),
+	FOREIGN KEY (agent) REFERENCES agent (id)
 );
+
+CREATE TABLE prestop (
+	id SERIAL PRIMARY KEY,
+	cena INT,
+	datum DATE,
+	stanje BOOLEAN,
+	igralec SERIAL,
+	iz_kluba SERIAL,
+	v_klub SERIAL,
+	agent SERIAL,
+	FOREIGN KEY (igralec) REFERENCES igralci (id),
+	FOREIGN KEY (iz_kluba) REFERENCES klub (id),
+	FOREIGN KEY (v_klub) REFERENCES klub (id),
+	FOREIGN KEY (agent) REFERENCES agent(id)
+);
+
 /*Omogočim povezavo sodelavcem*/
 
 GRANT CONNECT ON DATABASE sem2019_matijagh TO matevzr WITH GRANT OPTION;
