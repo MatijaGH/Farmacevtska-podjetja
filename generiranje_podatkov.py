@@ -162,6 +162,7 @@ def uvozi_podatke_agent():
             print("Uvožen agent %s z ID-jem %d" % (r[0], rid))
     conn.commit()
 
+#problem pri uvozu, ker so naslovi z vejicami. POpravi v mock data ali loči z ;
 def uvozi_podatke_igralci():
     with open("Podatki/igralci.csv") as f:
         rd = csv.reader(f)
@@ -176,7 +177,7 @@ def uvozi_podatke_igralci():
                 RETURNING id
             """, r)
             rid, = cur.fetchone()
-            print("Uvožen igralec %s z ID-jem %d" % (r[0], rid))
+            #print("Uvožen igralec %s z ID-jem %d" % (r[0], rid))
     conn.commit()
 
 def uvozi_podatke_klubi():
@@ -185,6 +186,7 @@ def uvozi_podatke_klubi():
         next(rd) 
         for r in rd:
             r = [None if x in ('', '-') else x for x in r]
+            print(r)
             cur.execute("""
                 INSERT INTO klub
                 (id, ime, naslov)
@@ -215,4 +217,4 @@ uvozi_podatke_agent()
 uvozi_podatke_klubi()
 uvozi_podatke_igralci()
 
-test()
+
