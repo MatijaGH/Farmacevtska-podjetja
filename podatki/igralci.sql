@@ -1,16 +1,4 @@
-create table IGRALCI_DATA (
-	ID INT,
-	ime VARCHAR(50),
-	priimek VARCHAR(50),
-	država VARCHAR(50),
-	placa INT,
-	datum_rojstva DATE,
-	random_stevilo_mlajsi INT,
-	random_stevilo_srednji INT,
-	random_stevilo_starejsi INT,
-	vrednost DECIMAL(10,2)
-);
-insert into IGRALCI_DATA (ID, ime, priimek, država, placa, datum_rojstva, random_stevilo_mlajsi, random_stevilo_srednji, random_stevilo_starejsi, vrednost) values (1, 'Udale', 'Swaton', 'United Kingdom', 484000, '13/8/1987', 59, 4, 3, 1452000);
+﻿insert into IGRALCI_DATA (ID, ime, priimek, država, placa, datum_rojstva, random_stevilo_mlajsi, random_stevilo_srednji, random_stevilo_starejsi, vrednost) values (1, 'Udale', 'Swaton', 'United Kingdom', 484000, '13/8/1987', 59, 4, 3, 1452000);
 insert into IGRALCI_DATA (ID, ime, priimek, država, placa, datum_rojstva, random_stevilo_mlajsi, random_stevilo_srednji, random_stevilo_starejsi, vrednost) values (2, 'Willard', 'Brankley', 'Croatia', 782000, '9/6/1997', 52, 3, 3, 40664000);
 insert into IGRALCI_DATA (ID, ime, priimek, država, placa, datum_rojstva, random_stevilo_mlajsi, random_stevilo_srednji, random_stevilo_starejsi, vrednost) values (3, 'Aluino', 'Rossant', 'Russia', 623000, '2/7/1998', 61, 7, 8, 38003000);
 insert into IGRALCI_DATA (ID, ime, priimek, država, placa, datum_rojstva, random_stevilo_mlajsi, random_stevilo_srednji, random_stevilo_starejsi, vrednost) values (4, 'Joey', 'Ferryman', 'Croatia', 710000, '2/11/1994', 65, 13, 7, 9230000);

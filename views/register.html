@@ -36,35 +36,43 @@
 </head>
 
 <body class="animsition">
-    <div class="page-wrapper">
+    <div class="page-wrapper" style="overflow: scroll">
         <div class="page-content--bge5">
             <div class="container">
                 <div class="login-wrap" style="padding-top:1%">
                     <div class="login-content">
-                        <div class="login-logo" style="margin-bottom:20px">
-                            <a href="#">
-                                <img src="/static/images/icon/logo2.png" alt="CoolAdmin" style="width:150px">
-                            </a>
-                        </div>
+                
                         <div class="login-form">
                             <form action="" method="post">
                                 <div class="form-group">
-                                    <label>Uporabniško ime</label>
+                                    <label style="margin-bottom:2px;font-size:15px">Uporabniško ime</label>
                                     <input class="au-input au-input--full" type="text" name="username" placeholder="Uporabniško ime">
                                 </div>
                                 <div class="form-group">
-                                    <label>Email naslov</label>
+                                    <label style="margin-bottom:2px;font-size:15px">Email naslov</label>
                                     <input class="au-input au-input--full" type="email" name="email" placeholder="Email naslov">
                                 </div>
+                                <div class="form-group" style="width:45%;float:left;margin-right:2.5%">
+                                    <label style="margin-bottom:2px;font-size:15px;">Ime</label>
+                                    <input class="au-input au-input--full" type="text" name="ime" placeholder="Ime">
+                                </div>
+                                <div class="form-group" style="width:50%;float:right">
+                                    <label style="margin-bottom:2px;font-size:15px">Priimek</label>
+                                    <input class="au-input au-input--full" type="text" name="priimek" placeholder="Priimek">
+                                </div>
                                 <div class="form-group">
-                                    <label>Geslo</label>
+                                    <label style="margin-bottom:2px;font-size:15px">Geslo</label>
                                     <input class="au-input au-input--full" type="password" name="password" placeholder="Geslo">
                                 </div>
+                                <div class="form-group">
+                                    <label style="margin-bottom:2px;font-size:15px">Ponovi geslo</label>
+                                    <input class="au-input au-input--full" type="password" name="password2" placeholder="Potrdi svoje geslo">
+                                </div>
                                 <div class="col-12 col-md-9" style="padding-left:0px;padding-right:0px;margin-top:10px;margin-bottom:20px">
-                                    <div style="margin-bottom: 10px">
+                                    <div style="margin-bottom: 10px;font-size:15px">
                                         Izberi svojo vlogo
                                     </div>
-                                    <select name="select" id="select" class="form-control" style="width:100%">
+                                    <select name="vloga" id="select" class="form-control" style="width:100%">
                                         <option value="0">Izberi možnost</option>
                                         <option value="1">Agent</option>
                                         <option value="2">Igralec</option>
