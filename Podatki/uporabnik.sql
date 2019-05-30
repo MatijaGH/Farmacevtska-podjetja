@@ -1,4 +1,4 @@
-tcreate table uporabnik (
+create table uporabnik (
 	uporabnisko_ime VARCHAR(50),
 	geslo VARCHAR(50),
 	vloga INT

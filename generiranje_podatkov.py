@@ -103,6 +103,16 @@ def ustvari_tabelo_prestop():
     """)
     conn.commit()
 
+def ustvari_tabelo_uporabnik():
+    cur.execute("""
+        CREATE TABLE uporabnik (
+            uporabnisko_ime VARCHAR(50) PRIMARY KEY,
+            geslo VARCHAR(50),
+            vloga VARCHAR(50)
+        );
+    """)
+    conn.commit()
+
 #Ukazi za dodajanje podatkov v tabelo igralec(klub/agent)
 
 def dodaj_podatke_igralci():
@@ -141,6 +151,12 @@ def pobrisi_tabelo_prestop():
 def pobrisi_tabelo_igralci():
     cur.execute("""
         DROP TABLE IF EXISTS igralci CASCADE;
+    """)
+    conn.commit()
+
+def pobrisi_tabelo_uporabnik():
+    cur.execute("""
+        DROP TABLE IF EXISTS uporabnik CASCADE;
     """)
     conn.commit()
 
@@ -197,13 +213,32 @@ def uvozi_podatke_klubi():
             print("Uvožen klub %s z ID-jem %d" % (r[0], rid))
     conn.commit()
 
+def uvozi_podatke_uporabnik():
+    with open("Podatki/uporabnik_agent.csv") as f:
+        rd = csv.reader(f, delimiter = ';')
+        next(rd)
+        for r in rd:
+            cur.execute("""
+                INSERT INTO uporabnik
+                (uporabnisko_ime, geslo, vloga)
+                VALUES (%s,%s,%s)
+                RETURNING uporabnisko_ime
+            """, r)
+            rid = cur.fetchone()
+    conn.commit()
+
 
 #Test, ali vse deluje, kot mora
 
 def test():
     cur.execute("select * from agent")
     print(cur.fetchall())
+
     
+pobrisi_tabelo_uporabnik()
+ustvari_tabelo_uporabnik()
+uvozi_podatke_uporabnik()
+
 
 pobrisi_tabelo_agent()
 pobrisi_tabelo_igralci()
@@ -216,5 +251,4 @@ ustvari_tabelo_prestop()
 uvozi_podatke_agent()
 uvozi_podatke_klubi()
 uvozi_podatke_igralci()
-
 
