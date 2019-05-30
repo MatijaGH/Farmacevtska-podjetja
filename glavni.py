@@ -182,4 +182,4 @@ def do_login():
 #     redirect("/index/")
 
 
-run(host='localhost', port=8080)
+run(host='localhost', port=8080, debug = True, reloader = True)
