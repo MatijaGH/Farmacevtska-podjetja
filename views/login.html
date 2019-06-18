@@ -68,6 +68,11 @@
                                     </label>
                                 </div>
                                 <button class="au-btn au-btn--block au-btn--green m-b-20" type="submit">prijavi se</button>
+                                <h5>
+                                    %if napaka is not None:
+									{{napaka}}
+							        %end
+                                </h5>
                             </form>
                             <div class="register-link">
                                 <p>
