@@ -44,6 +44,17 @@ CREATE TABLE prestop (
 	FOREIGN KEY (agent) REFERENCES agent(id)
 );
 
+CREATE TABLE uporabnik (
+	id SERIAL PRIMARY KEY,
+	uporabnikso_ime VARCHAR(50),
+	geslo VARCHAR(50),
+	vloga VARCHAR(50),
+	referenca VARCHAR(50),
+	FOREIGN KEY (referenca) REFERENCES igralci(id),
+	FOREIGN KEY (referenca) REFERENCES klub(id),
+	FOREIGN KEY (referenca) REFERENCES agent(id)
+);
+
 /*Omogočim povezavo sodelavcem*/
 
 GRANT CONNECT ON DATABASE sem2019_matijagh TO matevzr WITH GRANT OPTION;
