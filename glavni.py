@@ -15,6 +15,58 @@ cur = baza.cursor(cursor_factory=psycopg2.extras.DictCursor)
 #bottle.TEMPLATE_PATH.insert(0,"./CoolAdmin-master")
                             
 
+###POMOŽNE FUNKCIJE
+def get_kartica_igralec(tmp):
+    c = baza.cursor()
+    cur.execute("""
+        SELECT * FROM igralci WHERE id = %s""",
+        [tmp[0]])
+    podatki = cur.fetchone()
+    global ime
+    global priimek
+    global drzava
+    global placa
+    global datum_rojstva
+    
+    global vrednost
+    global klub
+    global agent
+    ime = podatki[1]
+    priimek = podatki[2]
+    drzava = podatki[3]
+    placa = podatki[4]
+    datum_rojstva = podatki[5]
+    vrednost = podatki[6]
+    klub = podatki[7]
+    agent = podatki[8]
+
+def get_kartica_agent(tmp):
+    c = baza.cursor()
+    cur.execute("""
+        SELECT * FROM agent WHERE id = %s""",
+        [tmp[0]])
+    podatki = cur.fetchone()
+    global ime
+    global priimek
+    ime = podatki[1]
+    priimek = podatki[2]
+
+def get_kartica_klub(tmp):
+    c = baza.cursor()
+    cur.execute("""
+        SELECT * FROM klub WHERE id = %s""",
+        [tmp[0]])
+    podatki = cur.fetchone()
+    global ime
+    global naslov
+    ime = podatki[1]
+    naslov = podatki[2]
+
+
+###KONEC POMOŽNIH FUNKCIJ
+
+
+
 
 ################
 #test priklopa na bazo(ni še v redu, popraviti moram program za tabelo)
@@ -143,6 +195,7 @@ def do_login():
                     SELECT * FROM uporabnik WHERE uporabnisko_ime=%s AND geslo=%s
                     ''', [username, password])
     tmp = cur.fetchone()
+    lol = tmp
     print(tmp)
     # preverimo, če je uporabnik v bazi
     if tmp is None:
@@ -153,10 +206,13 @@ def do_login():
     else:
         response.set_cookie('username', username, path='/', secret=secret)
         if tmp[3] == 'igralec;':
+            get_kartica_igralec(tmp)
             redirect('/index-igralec/')
         elif tmp[3] == 'agent;':
+            get_kartica_agent(tmp)
             redirect("/index-agent/")
         else:
+            get_kartica_klub(tmp)
             redirect("/index-klub/")
 # else:
     #     # Vse je v redu, nastavimo cookie in preusmerimo na glavno stran
@@ -184,6 +240,7 @@ def register_get():
     """Serviraj formo za registracijo"""
     curuser = get_user(auto_login = False, auto_redir = True)
     return template("register.html")
+
 @post("/register/")
 def nov_zahtevek():
     username = request.forms.username
