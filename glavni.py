@@ -230,6 +230,12 @@ def index_agent_get():
 def index_igralec_get():
     """Serviraj formo za index1."""
     return template("index-igralec.html")
+
+@get("/index-klub/")
+def index_klub_get():
+    """Serviraj formo za index-klub."""
+    return template("index-klub.html")
+
 @get("/prestopi/")
 def prestopi_get():
     """Serviraj formo za index1."""
