@@ -18,19 +18,21 @@ cur = baza.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
 ################
 #test priklopa na bazo(ni še v redu, popraviti moram program za tabelo)
-def test():
-    cur.execute('''
-                    SELECT * FROM uporabnik WHERE vloga = 'agent'
-                    ''')
-    return (cur.fetchall())
 
-print(test())
-def test2():
-    cur.execute('''
-                    SELECT * FROM uporabnik WHERE vloga = 'igralec'
-                    ''')
-    return (cur.fetchall())
-print(test2())
+##def test():
+##    cur.execute('''
+##                    SELECT * FROM uporabnik WHERE vloga = 'agent;'
+##                    ''')
+##    return (cur.fetchall())
+##
+##print(test())
+##def test2():
+##    cur.execute('''
+##                    SELECT * FROM uporabnik WHERE vloga = 'igralec;'
+##                    ''')
+##    return (cur.fetchall())
+##print(test2())
+
 ################
 #bottle uvod, pomozne funkcije
 
@@ -69,9 +71,9 @@ def get_user(auto_login = True, auto_redir=False):
     if username is not None:
         #Ce uporabnik ze prijavljen, nima smisla, da je na route login
         if auto_redir:
-                if tmp[2] == 'igralec':
+                if tmp[3] == 'igralec;':
                     redirect('/index-igralec/')
-                elif tmp[2] == 'agent':
+                elif tmp[3] == 'agent;':
                     redirect("/index-agent/")
                 else:
                     redirect("/index-klub/")
@@ -109,6 +111,15 @@ def static(filename):
 
 ################
 #bottle routes
+@get("/")
+def zero_get():
+    "Takoj preusmeri na login stran."
+    curuser = get_user(auto_login = False, auto_redir = True)
+    return template("login.html",
+                           napaka=None,
+                           username=None)
+
+
 @get("/login/")
 def login_get():
     """Serviraj formo za login."""
@@ -132,6 +143,7 @@ def do_login():
                     SELECT * FROM uporabnik WHERE uporabnisko_ime=%s AND geslo=%s
                     ''', [username, password])
     tmp = cur.fetchone()
+    print(tmp)
     # preverimo, če je uporabnik v bazi
     if tmp is None:
             return template("login.html",
@@ -140,9 +152,9 @@ def do_login():
                      )
     else:
         response.set_cookie('username', username, path='/', secret=secret)
-        if tmp[2] == 'igralec':
+        if tmp[3] == 'igralec;':
             redirect('/index-igralec/')
-        elif tmp[2] == 'agent':
+        elif tmp[3] == 'agent;':
             redirect("/index-agent/")
         else:
             redirect("/index-klub/")
