@@ -40,45 +40,110 @@
         <div class="page-content--bge5">
             <div class="container">
                 <div class="login-wrap" style="padding-top:1%">
-                    <div class="login-content">
+                    <div class="login-content" style="padding-top:10px">
                 
                         <div class="login-form">
                             <form action="" method="post">
-                                <div class="form-group">
-                                    <label style="margin-bottom:2px;font-size:15px">Uporabniško ime</label>
-                                    <input class="au-input au-input--full" type="text" name="username" placeholder="Uporabniško ime">
+                                    <div id="wrapper_moznosti" class="col-12 col-md-9" style="padding-left:0px;padding-right:0px;margin-top:10px;margin-bottom:20px">
+                                        <div id="izberi_ponovno" style="padding-bottom:10px;color:#63c76a;display:none;font-size:12px;cursor:pointer">Želiš izbrati vlogo ponovno? Klikni tukaj!</div>
+                                            <div style="margin-bottom: 10px;font-size:15px">
+                                                Izberi svojo vlogo
+                                                <i id="izbrano" class="fas fa-check" style="display: none;color:greenyellow;margin-left:1.5em"></i>
+                                                
+                                            </div>
+                                            <select name="vloga" id="select" class="form-control" style="width:100%">
+                                                <option value="0">Izberi možnost</option>
+                                                <option value="1">Agent</option>
+                                                <option value="2">Igralec</option>
+                                                <option value="3">Klub</option>
+                                            </select>
+                                        </div>
+                                        
+                            <div style="display:none" class="podatki">
+                                <div id="igralec">
+                                        <div class="form-group">
+                                                <label style="margin-bottom:2px;font-size:15px">Uporabniško ime</label>
+                                                <input class="au-input au-input--full" type="text" name="username" placeholder="Uporabniško ime">
+                                            </div>
+                                            <div class="form-group">
+                                                <label style="margin-bottom:2px;font-size:15px">Email naslov</label>
+                                                <input class="au-input au-input--full" type="email" name="email" placeholder="Email naslov">
+                                            </div>
+                                            <div class="form-group" style="width:45%;float:left;margin-right:2.5%">
+                                                <label style="margin-bottom:2px;font-size:15px;">Ime</label>
+                                                <input class="au-input au-input--full" type="text" name="ime" placeholder="Ime">
+                                            </div>
+                                            <div class="form-group" style="width:50%;float:right">
+                                                <label style="margin-bottom:2px;font-size:15px">Priimek</label>
+                                                <input class="au-input au-input--full" type="text" name="priimek" placeholder="Priimek">
+                                            </div>
+                                            <div class="form-group">
+                                                    <label style="margin-bottom:2px;font-size:15px">Starost</label>
+                                                    <input class="au-input au-input--full" type="number" name="age" placeholder="Starost">
+                                                </div>
+                                            <div class="form-group">
+                                                <label style="margin-bottom:2px;font-size:15px">Geslo</label>
+                                                <input class="au-input au-input--full" type="password" name="password" placeholder="Geslo">
+                                            </div>
+                                            <div class="form-group">
+                                                <label style="margin-bottom:2px;font-size:15px">Ponovi geslo</label>
+                                                <input class="au-input au-input--full" type="password" name="password2" placeholder="Potrdi svoje geslo">
+                                            </div>
                                 </div>
-                                <div class="form-group">
-                                    <label style="margin-bottom:2px;font-size:15px">Email naslov</label>
-                                    <input class="au-input au-input--full" type="email" name="email" placeholder="Email naslov">
+                                <div id="klub">
+                                        <div class="form-group">
+                                                <label style="margin-bottom:2px;font-size:15px">Uporabniško ime</label>
+                                                <input class="au-input au-input--full" type="text" name="username" placeholder="Uporabniško ime">
+                                            </div>
+                                            <div class="form-group">
+                                                <label style="margin-bottom:2px;font-size:15px">Email naslov</label>
+                                                <input class="au-input au-input--full" type="email" name="email" placeholder="Email naslov">
+                                            </div>
+                                            <div class="form-group" >
+                                                <label style="margin-bottom:2px;font-size:15px;">Ime</label>
+                                                <input class="au-input au-input--full" type="text" name="ime" placeholder="Ime">
+                                            </div>
+                                            <div class="form-group">
+                                                    <label style="margin-bottom:2px;font-size:15px">Naslov</label>
+                                                    <input class="au-input au-input--full" type="text" name="naslov" placeholder="Naslov">
+                                                </div>
+                                            <div class="form-group">
+                                                <label style="margin-bottom:2px;font-size:15px">Geslo</label>
+                                                <input class="au-input au-input--full" type="password" name="password" placeholder="Geslo">
+                                            </div>
+                                            <div class="form-group">
+                                                <label style="margin-bottom:2px;font-size:15px">Ponovi geslo</label>
+                                                <input class="au-input au-input--full" type="password" name="password2" placeholder="Potrdi svoje geslo">
+                                            </div>
                                 </div>
-                                <div class="form-group" style="width:45%;float:left;margin-right:2.5%">
-                                    <label style="margin-bottom:2px;font-size:15px;">Ime</label>
-                                    <input class="au-input au-input--full" type="text" name="ime" placeholder="Ime">
+                                <div id="agent">
+                                        <div class="form-group">
+                                                <label style="margin-bottom:2px;font-size:15px">Uporabniško ime</label>
+                                                <input class="au-input au-input--full" type="text" name="username" placeholder="Uporabniško ime">
+                                            </div>
+                                            <div class="form-group">
+                                                <label style="margin-bottom:2px;font-size:15px">Email naslov</label>
+                                                <input class="au-input au-input--full" type="email" name="email" placeholder="Email naslov">
+                                            </div>
+                                            <div class="form-group" style="width:45%;float:left;margin-right:2.5%">
+                                                <label style="margin-bottom:2px;font-size:15px;">Ime</label>
+                                                <input class="au-input au-input--full" type="text" name="ime" placeholder="Ime">
+                                            </div>
+                                            <div class="form-group" style="width:50%;float:right">
+                                                <label style="margin-bottom:2px;font-size:15px">Priimek</label>
+                                                <input class="au-input au-input--full" type="text" name="priimek" placeholder="Priimek">
+                                            </div>
+                                            <div class="form-group">
+                                                <label style="margin-bottom:2px;font-size:15px">Geslo</label>
+                                                <input class="au-input au-input--full" type="password" name="password" placeholder="Geslo">
+                                            </div>
+                                            <div class="form-group">
+                                                <label style="margin-bottom:2px;font-size:15px">Ponovi geslo</label>
+                                                <input class="au-input au-input--full" type="password" name="password2" placeholder="Potrdi svoje geslo">
+                                            </div>
                                 </div>
-                                <div class="form-group" style="width:50%;float:right">
-                                    <label style="margin-bottom:2px;font-size:15px">Priimek</label>
-                                    <input class="au-input au-input--full" type="text" name="priimek" placeholder="Priimek">
-                                </div>
-                                <div class="form-group">
-                                    <label style="margin-bottom:2px;font-size:15px">Geslo</label>
-                                    <input class="au-input au-input--full" type="password" name="password" placeholder="Geslo">
-                                </div>
-                                <div class="form-group">
-                                    <label style="margin-bottom:2px;font-size:15px">Ponovi geslo</label>
-                                    <input class="au-input au-input--full" type="password" name="password2" placeholder="Potrdi svoje geslo">
-                                </div>
-                                <div class="col-12 col-md-9" style="padding-left:0px;padding-right:0px;margin-top:10px;margin-bottom:20px">
-                                    <div style="margin-bottom: 10px;font-size:15px">
-                                        Izberi svojo vlogo
-                                    </div>
-                                    <select name="vloga" id="select" class="form-control" style="width:100%">
-                                        <option value="0">Izberi možnost</option>
-                                        <option value="1">Agent</option>
-                                        <option value="2">Igralec</option>
-                                        <option value="3">Klub</option>
-                                    </select>
-                                </div>
+                                
+                            </div>
                                 <button class="au-btn au-btn--block au-btn--green m-b-20" type="submit">Registriraj se</button>
                             </form>
                             <div class="register-link">
@@ -115,7 +180,46 @@
     <script src="/static/vendor/chartjs/Chart.bundle.min.js"></script>
     <script src="/static/vendor/select2/select2.min.js">
     </script>
-
+    <script>$(function(){
+        $('#select').change(function(){
+         if($(this).val() == '1'){ 
+            $('.podatki').css('display','block');
+            $('#select').css('display','none');
+            $('#agent').css('display','block');
+            $('#igralec').css('display','none');
+            $('#klub').css('display','none');
+            $('#izbrano').css('display', 'inline');
+            $('#izberi_ponovno').css('display', 'block');
+            $('#wrapper_moznosti').css('margin-bottom','0px')
+          }
+          else if($(this).val() == '2'){ 
+            $('.podatki').css('display','block');
+            $('#select').css('display','none');
+            $('#agent').css('display','none');
+            $('#igralec').css('display','block');
+            $('#klub').css('display','none');
+            $('#izbrano').css('display', 'inline');
+            $('#izberi_ponovno').css('display', 'block');
+            $('#wrapper_moznosti').css('margin-bottom','0px')
+          }
+          else if($(this).val() == '3'){
+            $('.podatki').css('display','block'); 
+            $('#select').css('display','none');
+            $('#agent').css('display','none');
+            $('#igralec').css('display','none');
+            $('#klub').css('display','block');
+            $('#izbrano').css('display', 'inline');
+            $('#izberi_ponovno').css('display', 'block');
+            $('#wrapper_moznosti').css('margin-bottom','0px')
+          }
+        });
+    $('#izberi_ponovno').click(function(){
+        $('#select').css('display','block');
+        $('#izbrano').css('display', 'none');
+        $('#izberi_ponovno').css('display', 'none');
+        $('#wrapper_moznosti').css('margin-bottom','15px')
+    })
+    });</script>
     <!-- Main JS-->
     <script src="/static/js/main.js"></script>
 
