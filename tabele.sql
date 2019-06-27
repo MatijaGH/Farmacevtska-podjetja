@@ -2,58 +2,59 @@
 DROP TABLE IF EXISTS prestop CASCADE;
 DROP TABLE IF EXISTS klub CASCADE;
 DROP TABLE IF EXISTS agent CASCADE;
+DROP TABLE IF EXISTS uporabnik CASCADE;
 
 CREATE TABLE agent (
-	id SERIAL PRIMARY KEY,
-	ime VARCHAR(50),
-	priimek VARCHAR(50)
-);
+	    id SERIAL PRIMARY KEY,
+	    ime VARCHAR(50),
+	    priimek VARCHAR(50),
+	    FOREIGN KEY (id) REFERENCES uporabnik(id)
+        );
 
 
 CREATE TABLE klub (
-	id SERIAL PRIMARY KEY,
-	Ime VARCHAR(50),
-	Naslov VARCHAR(50)
-);
+	    id SERIAL PRIMARY KEY,
+	    Ime VARCHAR(50),
+	    Naslov VARCHAR(50),
+	    FOREIGN KEY (id) REFERENCES uporabnik(id)
+        );
 
 CREATE TABLE igralci (
-	id SERIAL PRIMARY KEY,
-	ime VARCHAR(50),
-	priimek VARCHAR(50),
-	država VARCHAR(50),
-	plača INT,
-	vrednost INT,
-	klub SERIAL,
-	agent SERIAL,
-	FOREIGN KEY (klub) REFERENCES klub (id),
-	FOREIGN KEY (agent) REFERENCES agent (id)
-);
+	        id SERIAL PRIMARY KEY,
+	        ime VARCHAR(50),
+	        priimek VARCHAR(50),
+	        država VARCHAR(50),
+	        plača INT,
+	        datum_rojstva VARCHAR(50),
+	        vrednost INT,
+	        klub INT,
+	        agent INT,
+	        FOREIGN KEY (klub) REFERENCES klub (id),
+	        FOREIGN KEY (agent) REFERENCES agent (id),
+	        FOREIGN KEY (id) REFERENCES uporabnik (id)
+        );
 
 CREATE TABLE prestop (
-	id SERIAL PRIMARY KEY,
-	cena INT,
-	datum DATE,
-	stanje BOOLEAN,
-	igralec SERIAL,
-	iz_kluba SERIAL,
-	v_klub SERIAL,
-	agent SERIAL,
-	FOREIGN KEY (igralec) REFERENCES igralci (id),
-	FOREIGN KEY (iz_kluba) REFERENCES klub (id),
-	FOREIGN KEY (v_klub) REFERENCES klub (id),
-	FOREIGN KEY (agent) REFERENCES agent(id)
-);
+	        id SERIAL PRIMARY KEY,
+	        cena INT,
+	        datum DATE,
+	        stanje BOOLEAN,
+	        igralec SERIAL,
+	        iz_kluba SERIAL,
+	        v_klub SERIAL,
+	        agent SERIAL,
+	        FOREIGN KEY (igralec) REFERENCES igralci (id),
+	        FOREIGN KEY (iz_kluba) REFERENCES klub (id),
+	        FOREIGN KEY (v_klub) REFERENCES klub (id),
+	        FOREIGN KEY (agent) REFERENCES agent(id)
+        );
 
 CREATE TABLE uporabnik (
-	id SERIAL PRIMARY KEY,
-	uporabnikso_ime VARCHAR(50),
-	geslo VARCHAR(50),
-	vloga VARCHAR(50),
-	referenca VARCHAR(50),
-	FOREIGN KEY (referenca) REFERENCES igralci(id),
-	FOREIGN KEY (referenca) REFERENCES klub(id),
-	FOREIGN KEY (referenca) REFERENCES agent(id)
-);
+	            id SERIAL PRIMARY KEY,
+	            uporabnisko_ime VARCHAR(50),
+	            geslo VARCHAR(50),
+	            vloga VARCHAR(50)
+        );
 
 /*Omogočim povezavo sodelavcem*/
 
