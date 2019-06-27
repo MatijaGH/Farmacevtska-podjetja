@@ -257,7 +257,7 @@ def uvozi_podatke_klubi():
 #treba je še uvoziti poadtke za uporabnika
 
 def uvozi_podatke_uporabnik():
-    with open("Podatki/uporabniki.csv") as f:
+    with open("Podatki/uporabnik.csv") as f:
         rd = csv.reader(f, delimiter = ',')
         for r in rd:
             #print(r)

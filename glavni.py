@@ -15,22 +15,76 @@ cur = baza.cursor(cursor_factory=psycopg2.extras.DictCursor)
 #bottle.TEMPLATE_PATH.insert(0,"./CoolAdmin-master")
                             
 
+###POMOŽNE FUNKCIJE
+def get_kartica_igralec(tmp):
+    c = baza.cursor()
+    cur.execute("""
+        SELECT * FROM igralci WHERE id = %s""",
+        [tmp[0]])
+    podatki = cur.fetchone()
+    global ime
+    global priimek
+    global drzava
+    global placa
+    global datum_rojstva
+    
+    global vrednost
+    global klub
+    global agent
+    ime = podatki[1]
+    priimek = podatki[2]
+    drzava = podatki[3]
+    placa = podatki[4]
+    datum_rojstva = podatki[5]
+    vrednost = podatki[6]
+    klub = podatki[7]
+    agent = podatki[8]
+
+def get_kartica_agent(tmp):
+    c = baza.cursor()
+    cur.execute("""
+        SELECT * FROM agent WHERE id = %s""",
+        [tmp[0]])
+    podatki = cur.fetchone()
+    global ime
+    global priimek
+    ime = podatki[1]
+    priimek = podatki[2]
+
+def get_kartica_klub(tmp):
+    c = baza.cursor()
+    cur.execute("""
+        SELECT * FROM klub WHERE id = %s""",
+        [tmp[0]])
+    podatki = cur.fetchone()
+    global ime
+    global naslov
+    ime = podatki[1]
+    naslov = podatki[2]
+
+
+###KONEC POMOŽNIH FUNKCIJ
+
+
+
 
 ################
 #test priklopa na bazo(ni še v redu, popraviti moram program za tabelo)
-def test():
-    cur.execute('''
-                    SELECT * FROM uporabnik WHERE vloga = 'agent'
-                    ''')
-    return (cur.fetchall())
 
-print(test())
-def test2():
-    cur.execute('''
-                    SELECT * FROM uporabnik WHERE vloga = 'igralec'
-                    ''')
-    return (cur.fetchall())
-print(test2())
+##def test():
+##    cur.execute('''
+##                    SELECT * FROM uporabnik WHERE vloga = 'agent;'
+##                    ''')
+##    return (cur.fetchall())
+##
+##print(test())
+##def test2():
+##    cur.execute('''
+##                    SELECT * FROM uporabnik WHERE vloga = 'igralec;'
+##                    ''')
+##    return (cur.fetchall())
+##print(test2())
+
 ################
 #bottle uvod, pomozne funkcije
 
@@ -69,9 +123,9 @@ def get_user(auto_login = True, auto_redir=False):
     if username is not None:
         #Ce uporabnik ze prijavljen, nima smisla, da je na route login
         if auto_redir:
-                if tmp[2] == 'igralec':
+                if tmp[3] == 'igralec;':
                     redirect('/index-igralec/')
-                elif tmp[2] == 'agent':
+                elif tmp[3] == 'agent;':
                     redirect("/index-agent/")
                 else:
                     redirect("/index-klub/")
@@ -109,6 +163,15 @@ def static(filename):
 
 ################
 #bottle routes
+@get("/")
+def zero_get():
+    "Takoj preusmeri na login stran."
+    curuser = get_user(auto_login = False, auto_redir = True)
+    return template("login.html",
+                           napaka=None,
+                           username=None)
+
+
 @get("/login/")
 def login_get():
     """Serviraj formo za login."""
@@ -132,6 +195,8 @@ def do_login():
                     SELECT * FROM uporabnik WHERE uporabnisko_ime=%s AND geslo=%s
                     ''', [username, password])
     tmp = cur.fetchone()
+    lol = tmp
+    print(tmp)
     # preverimo, če je uporabnik v bazi
     if tmp is None:
             return template("login.html",
@@ -140,11 +205,14 @@ def do_login():
                      )
     else:
         response.set_cookie('username', username, path='/', secret=secret)
-        if tmp[2] == 'igralec':
+        if tmp[3] == 'igralec;':
+            get_kartica_igralec(tmp)
             redirect('/index-igralec/')
-        elif tmp[2] == 'agent':
+        elif tmp[3] == 'agent;':
+            get_kartica_agent(tmp)
             redirect("/index-agent/")
         else:
+            get_kartica_klub(tmp)
             redirect("/index-klub/")
 # else:
     #     # Vse je v redu, nastavimo cookie in preusmerimo na glavno stran
@@ -162,6 +230,12 @@ def index_agent_get():
 def index_igralec_get():
     """Serviraj formo za index1."""
     return template("index-igralec.html")
+
+@get("/index-klub/")
+def index_klub_get():
+    """Serviraj formo za index-klub."""
+    return template("index-klub.html")
+
 @get("/prestopi/")
 def prestopi_get():
     """Serviraj formo za index1."""
@@ -172,6 +246,7 @@ def register_get():
     """Serviraj formo za registracijo"""
     curuser = get_user(auto_login = False, auto_redir = True)
     return template("register.html")
+
 @post("/register/")
 def nov_zahtevek():
     username = request.forms.username

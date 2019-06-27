@@ -12,7 +12,7 @@
 #stranki imeli za izpolnit formo(izbrati igralca, vnesti datum, plačo, ...)
 #To se bo nato vstavilo v tabelo prestopi in posredovalo v potrjevanje.
 
-def predlagaj_prestop():
+def predlagaj_prestop(igralec, cena, datum, ):
     cur.execute("""
         INSERT INTO prestop
         (id_igralec, cena, datum, potrjen)
@@ -51,6 +51,106 @@ def zamenjaj_agenta(nov_agent):
     print("Agent %s z ID-jem  %d" % (r[0], rid))
     conn.commit()
 
+###Iskanje oseb
+###Veliko lažje, če najprej pove kaj išče in nato samo pregledamo
+
+def poisci(vnos):
+    if not isinstance(vnos,int):
+        return None
+    else:
+        if vnos <= 1000:
+            cur.execute("""SELECT * FROM igralci WHERE id = %d""",
+                    [vnos])
+            podatki = cur.fetchone()
+        elif vnos <= 2000:
+            cur.execute("""SELECT * FROM agent WHERE id = %d""",
+                    [vnos])
+            podatki = cur.fetchone()
+        else:
+            cur.execute("""SELECT * FROM klub WHERE id = %d""",
+                    [vnos])
+            podatki = cur.fetchone()
+
+
+###PRESTOPI
+def poglej_vse_prestope():
+    cur.execute("""SELECT * FROM prestopi""")
+    return cur.fetchall()
+
+def poglej_neuspele_prestope():
+    cur.execute("""SELECT * FROM prestopi WHERE stanje = FALSE""")
+    return cur.fetchall()
+
+def poglej_uspele_prestope():
+    cur.execute("""SELECT * FROM prestopi WHERE stanje = TRUE""")
+    return cur.fetchall()
+    
+##def poisci(vnos):
+##    if isinstance(vnos,int):
+##        if vnos <= 1000:
+##            cur.execute("""SELECT * from igralci WHERE id = %d""",
+##                        [vnos])
+##            podatki = cur.fetchone()
+##        else if vnos <= 2000:
+##            cur.execute("""SELECT * from agent WHERE id = %d""",
+##                        [vnos])
+##            podatki = cur.fetchone()
+##        else:
+##            cur.execute("""SELECT * from klub WHERE id = %d""",
+##                        [vnos])
+##            podatki = cur.fetchone()
+##    else:
+##        if 
+
+
+    
+
+###Za igralca
+###Kartica profila
+def get_kartica_igralec(tmp):
+    c = baza.cursor()
+    cur.execute("""
+        SELECT * FROM igralci WHERE id = %s""",
+        [tmp[0]])
+    podatki = cur.fetchone()
+    global ime
+    global priimek
+    global drzava
+    global placa
+    global datum_rojstva
+    global vrednost
+    global klub
+    global agent
+    ime = podatki[1]
+    priimek = podatki[2]
+    drzava = podatki[3]
+    placa = podatki[4]
+    datum_rojstva = podatki[5]
+    vrednost = podatki[6]
+    klub = podatki[7]
+    agent = podatki[8]
+
+def get_kartica_agent(tmp):
+    c = baza.cursor()
+    cur.execute("""
+        SELECT * FROM agent WHERE id = %s""",
+        [tmp[0]])
+    podatki = cur.fetchone()
+    global ime
+    global priimek
+    ime = podatki[1]
+    priimek = podatki[2]
+
+def get_kartica_klub(tmp):
+    c = baza.cursor()
+    cur.execute("""
+        SELECT * FROM klub WHERE id = %s""",
+        [tmp[0]])
+    podatki = cur.fetchone()
+    global ime
+    global naslov
+    ime = podatki[1]
+    naslov = podatki[2]
 
 
 
