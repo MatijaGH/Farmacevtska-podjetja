@@ -223,18 +223,67 @@ def do_login():
 
 @get("/index-agent/")
 def index_agent_get():
-    """Serviraj formo za index1."""
-    return template("index-agent.html")
+    """Serviraj formo za index-agent.html"""
+    username = request.get_cookie('username', secret = secret)
+    cur.execute('''
+                    SELECT * FROM uporabnik WHERE uporabnisko_ime=%s
+                    ''', [username])
+    tmp = cur.fetchone()
+    ID = tmp[0]
+    cur.execute(''' SELECT * FROM agent WHERE ID = %s''', [ID])
+    podatki = cur.fetchone()
+    ime = podatki[1]
+    priimek = podatki[2]
+    return template("index-agent.html", ime = ime, priimek = priimek, username = username)
 
 @get("/index-igralec/")
 def index_igralec_get():
-    """Serviraj formo za index1."""
-    return template("index-igralec.html")
+    """Serviraj formo za index-igralec.html"""
+    username = request.get_cookie('username', secret = secret)
+    cur.execute('''
+                    SELECT * FROM uporabnik WHERE uporabnisko_ime=%s
+                    ''', [username])
+    tmp = cur.fetchone()
+    ID = tmp[0]
+    cur.execute(''' SELECT * FROM igralci WHERE ID = %s''', [ID])
+    podatki = cur.fetchone()
+    ime = podatki[1]
+    priimek = podatki[2]
+    drzava = podatki[3]
+    placa = podatki[4]
+    datum_rojstva = podatki[5]
+    vrednost = podatki[6]
+    klub_id = podatki[7]
+    agent_id = podatki[8]
+
+    cur.execute('''SELECT * FROM klub WHERE id = %s''',[klub_id])
+    klub_vse = cur.fetchone()
+    klub = klub_vse[1]
+    klub_naslov = klub_vse[2]
+
+    cur.execute('''SELECT * FROM agent WHERE id = %s''', [agent_id])
+    agent_vse = cur.fetchone()
+    agent_ime = agent_vse[1]
+    agent_priimek = agent_vse[2]
+
+    return template("index-igralec.html", klub = klub, klub_naslov = klub_naslov, ime = ime, priimek = priimek, drzava = drzava, placa = placa,
+                    datum_rojstva = datum_rojstva, vrednost = vrednost,
+                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username)
 
 @get("/index-klub/")
 def index_klub_get():
     """Serviraj formo za index-klub.html"""
-    return template("index-klub.html")
+    username = request.get_cookie('username', secret = secret)
+    cur.execute('''
+                    SELECT * FROM uporabnik WHERE uporabnisko_ime=%s
+                    ''', [username])
+    tmp = cur.fetchone()
+    ID = tmp[0]
+    cur.execute(''' SELECT * FROM klub WHERE ID = %s''', [ID])
+    podatki = cur.fetchone()
+    ime = podatki[1]
+    naslov = podatki[2]
+    return template("index-klub.html", ime = ime, naslov = naslov, username = username)
 
 @get("/prestopi/")
 def prestopi_get():
@@ -270,11 +319,11 @@ def nov_zahtevek():
     username_klub = request.forms.get('username_klub')
     ime_klub = request.forms.get('ime_klub')
     naslov_klub = request.forms.get('naslov_klub')
-    print(vloga)
-    print(username_klub)
-    print(ime_klub)
-    print(geslo)
-    print(geslo2)
+##    print(vloga)
+##    print(username_klub)
+##    print(ime_klub)
+##    print(geslo)
+##    print(geslo2)
 
     
     c1 = baza.cursor()
@@ -360,6 +409,7 @@ def forget_pass_get():
 def form_get():
     """Serviraj formo za form"""
     return template("form.html")
+
 
 
 
