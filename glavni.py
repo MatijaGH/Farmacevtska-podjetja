@@ -13,60 +13,15 @@ baza.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT) # onemo
 cur = baza.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
 #bottle.TEMPLATE_PATH.insert(0,"./CoolAdmin-master")
-                            
-
-###POMOŽNE FUNKCIJE
-def get_kartica_igralec(tmp):
-    c = baza.cursor()
-    cur.execute("""
-        SELECT * FROM igralci WHERE id = %s""",
-        [tmp[0]])
-    podatki = cur.fetchone()
-    global ime
-    global priimek
-    global drzava
-    global placa
-    global datum_rojstva
-    
-    global vrednost
-    global klub
-    global agent
-    ime = podatki[1]
-    priimek = podatki[2]
-    drzava = podatki[3]
-    placa = podatki[4]
-    datum_rojstva = podatki[5]
-    vrednost = podatki[6]
-    klub = podatki[7]
-    agent = podatki[8]
-
-def get_kartica_agent(tmp):
-    c = baza.cursor()
-    cur.execute("""
-        SELECT * FROM agent WHERE id = %s""",
-        [tmp[0]])
-    podatki = cur.fetchone()
-    global ime
-    global priimek
-    ime = podatki[1]
-    priimek = podatki[2]
-
-def get_kartica_klub(tmp):
-    c = baza.cursor()
-    cur.execute("""
-        SELECT * FROM klub WHERE id = %s""",
-        [tmp[0]])
-    podatki = cur.fetchone()
-    global ime
-    global naslov
-    ime = podatki[1]
-    naslov = podatki[2]
 
 
-###KONEC POMOŽNIH FUNKCIJ
-
-
-
+###Pomožne funkcije
+def is_int(input):
+  try:
+    num = int(input)
+  except ValueError:
+    return False
+  return True
 
 ################
 #test priklopa na bazo(ni še v redu, popraviti moram program za tabelo)
@@ -195,8 +150,6 @@ def do_login():
                     SELECT * FROM uporabnik WHERE uporabnisko_ime=%s AND geslo=%s
                     ''', [username, password])
     tmp = cur.fetchone()
-    lol = tmp
-    print(tmp)
     # preverimo, če je uporabnik v bazi
     if tmp is None:
             return template("login.html",
@@ -206,13 +159,10 @@ def do_login():
     else:
         response.set_cookie('username', username, path='/', secret=secret)
         if tmp[3] == 'igralec;':
-            get_kartica_igralec(tmp)
             redirect('/index-igralec/')
         elif tmp[3] == 'agent;':
-            get_kartica_agent(tmp)
             redirect("/index-agent/")
         else:
-            get_kartica_klub(tmp)
             redirect("/index-klub/")
 # else:
     #     # Vse je v redu, nastavimo cookie in preusmerimo na glavno stran
@@ -220,6 +170,7 @@ def do_login():
     #     redirect("/index/")
 
 
+###GET METODE, DA PRAVILNO POKAŽE DOMAČO STRAN
 
 @get("/index-agent/")
 def index_agent_get():
@@ -234,7 +185,7 @@ def index_agent_get():
     podatki = cur.fetchone()
     ime = podatki[1]
     priimek = podatki[2]
-    return template("index-agent.html", ime = ime, priimek = priimek, username = username)
+    return template("index-agent.html", ime = ime, priimek = priimek, username = username, napaka = None)
 
 @get("/index-igralec/")
 def index_igralec_get():
@@ -268,7 +219,7 @@ def index_igralec_get():
 
     return template("index-igralec.html", klub = klub, klub_naslov = klub_naslov, ime = ime, priimek = priimek, drzava = drzava, placa = placa,
                     datum_rojstva = datum_rojstva, vrednost = vrednost,
-                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username)
+                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username, napaka = None)
 
 @get("/index-klub/")
 def index_klub_get():
@@ -283,7 +234,194 @@ def index_klub_get():
     podatki = cur.fetchone()
     ime = podatki[1]
     naslov = podatki[2]
-    return template("index-klub.html", ime = ime, naslov = naslov, username = username)
+    return template("index-klub.html", ime = ime, naslov = naslov, username = username, napaka = None)
+
+###POST METODE, DA PRAVILNO DELA PO VNOSU ČESARKOLI
+
+@post("/index-igralec/")
+def index_igralec_post():
+    "Kaj vse lahko stori na strani index-igralec."
+    username = request.get_cookie('username', secret = secret)
+    cur.execute('''
+                    SELECT * FROM uporabnik WHERE uporabnisko_ime=%s
+                    ''', [username])
+    tmp = cur.fetchone()
+    ID = tmp[0]
+    cur.execute(''' SELECT * FROM igralci WHERE ID = %s''', [ID])
+    podatki = cur.fetchone()
+    ime = podatki[1]
+    priimek = podatki[2]
+    drzava = podatki[3]
+    placa = podatki[4]
+    datum_rojstva = podatki[5]
+    vrednost = podatki[6]
+    klub_id = podatki[7]
+    agent_id = podatki[8]
+
+    cur.execute('''SELECT * FROM klub WHERE id = %s''',[klub_id])
+    klub_vse = cur.fetchone()
+    klub = klub_vse[1]
+    klub_naslov = klub_vse[2]
+
+    cur.execute('''SELECT * FROM agent WHERE id = %s''', [agent_id])
+    agent_vse = cur.fetchone()
+    agent_ime = agent_vse[1]
+    agent_priimek = agent_vse[2]
+    
+    
+    #Zaenkrat lahko išče le po id-jih, lahko bi dodali, da tudi po imenih, priimkih...
+    #Do crasha pride tudi, če namesto številke vnesemo niz...
+    poizvedba = request.forms.get('search')
+    if is_int(poizvedba):
+        cur.execute('''SELECT * FROM igralci WHERE id = %s''', [poizvedba])
+        rezultat_poizvedbe_igralec = cur.fetchone()
+        cur.execute('''SELECT * FROM agent WHERE id = %s''', [poizvedba])
+        rezultat_poizvedbe_agent = cur.fetchone()
+        cur.execute('''SELECT * FROM klub WHERE id = %s''', [poizvedba])
+        rezultat_poizvedbe_klub = cur.fetchone()
+
+        rezultat_poizvedbe = [rezultat_poizvedbe_igralec, rezultat_poizvedbe_agent, rezultat_poizvedbe_klub]
+        if rezultat_poizvedbe == [None, None, None]:
+            return template("index-igralec.html", klub = klub, klub_naslov = klub_naslov, ime = ime, priimek = priimek, drzava = drzava, placa = placa,
+                    datum_rojstva = datum_rojstva, vrednost = vrednost,
+                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username,
+                        napaka = "Oseba z iskanim ID ne obstaja!")
+        else:
+            return template("index-igralec.html", klub = klub, klub_naslov = klub_naslov, ime = ime, priimek = priimek, drzava = drzava, placa = placa,
+                    datum_rojstva = datum_rojstva, vrednost = vrednost,
+                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username, napaka = None)
+        
+    elif isinstance(poizvedba, str):
+        #Zaenkrat je treba ime napisati točno tako kot je v bazi, drugače ne njade, da se spremeniti s tem,
+        #da bi pretvoril niz iz poizvedbe
+        cur.execute('''SELECT * FROM igralci WHERE ime = %s''', [poizvedba])
+        rezultat_poizvedbe_igralec = cur.fetchone()
+        cur.execute('''SELECT * FROM agent WHERE ime = %s''', [poizvedba])
+        rezultat_poizvedbe_agent = cur.fetchone()
+        cur.execute('''SELECT * FROM klub WHERE ime = %s''', [poizvedba])
+        rezultat_poizvedbe_klub = cur.fetchone()
+
+        rezultat_poizvedbe = [rezultat_poizvedbe_igralec, rezultat_poizvedbe_agent, rezultat_poizvedbe_klub]
+        print(rezultat_poizvedbe)
+        if rezultat_poizvedbe == [None, None, None]:
+            return template("index-igralec.html", klub = klub, klub_naslov = klub_naslov, ime = ime, priimek = priimek, drzava = drzava, placa = placa,
+                    datum_rojstva = datum_rojstva, vrednost = vrednost,
+                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username,
+                        napaka = "Uporabnik z iskanim imenom ne obstaja!")
+        else:
+            return template("index-igralec.html", klub = klub, klub_naslov = klub_naslov, ime = ime, priimek = priimek, drzava = drzava, placa = placa,
+                    datum_rojstva = datum_rojstva, vrednost = vrednost,
+                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username, napaka = None)
+
+    return template("index-igralec.html", klub = klub, klub_naslov = klub_naslov, ime = ime, priimek = priimek, drzava = drzava, placa = placa,
+                    datum_rojstva = datum_rojstva, vrednost = vrednost,
+                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username, napaka = None)
+
+@post("/index-agent/")
+def index_agent_post():
+
+    username = request.get_cookie('username', secret = secret)
+    cur.execute('''
+                    SELECT * FROM uporabnik WHERE uporabnisko_ime=%s
+                    ''', [username])
+    tmp = cur.fetchone()
+    ID = tmp[0]
+    cur.execute(''' SELECT * FROM agent WHERE ID = %s''', [ID])
+    podatki = cur.fetchone()
+    ime = podatki[1]
+    priimek = podatki[2]
+    
+    poizvedba = request.forms.get('search')
+    if is_int(poizvedba):
+        cur.execute('''SELECT * FROM igralci WHERE id = %s''', [poizvedba])
+        rezultat_poizvedbe_igralec = cur.fetchone()
+        cur.execute('''SELECT * FROM agent WHERE id = %s''', [poizvedba])
+        rezultat_poizvedbe_agent = cur.fetchone()
+        cur.execute('''SELECT * FROM klub WHERE id = %s''', [poizvedba])
+        rezultat_poizvedbe_klub = cur.fetchone()
+
+        rezultat_poizvedbe = [rezultat_poizvedbe_igralec, rezultat_poizvedbe_agent, rezultat_poizvedbe_klub]
+        if rezultat_poizvedbe == [None, None, None]:
+            return template("index-agent.html", ime = ime, priimek = priimek, username = username,
+                            napaka = "Uporabnik z iskanim ID ne obstaja!")
+        else:
+            return template("index-agent.html", ime = ime, priimek = priimek, username = username, napaka = None)
+        
+    elif isinstance(poizvedba, str):
+        #Zaenkrat je treba ime napisati točno tako kot je v bazi, drugače ne njade, da se spremeniti s tem,
+        #da bi pretvoril niz iz poizvedbe
+        cur.execute('''SELECT * FROM igralci WHERE ime = %s''', [poizvedba])
+        rezultat_poizvedbe_igralec = cur.fetchone()
+        cur.execute('''SELECT * FROM agent WHERE ime = %s''', [poizvedba])
+        rezultat_poizvedbe_agent = cur.fetchone()
+        cur.execute('''SELECT * FROM klub WHERE ime = %s''', [poizvedba])
+        rezultat_poizvedbe_klub = cur.fetchone()
+
+        rezultat_poizvedbe = [rezultat_poizvedbe_igralec, rezultat_poizvedbe_agent, rezultat_poizvedbe_klub]
+        print(rezultat_poizvedbe)
+        if rezultat_poizvedbe == [None, None, None]:
+            return template("index-igralec.html", klub = klub, klub_naslov = klub_naslov, ime = ime, priimek = priimek, drzava = drzava, placa = placa,
+                    datum_rojstva = datum_rojstva, vrednost = vrednost,
+                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username,
+                        napaka = "Uporabnik z iskanim imenom ne obstaja!")
+        else:
+            return template("index-agent.html", ime = ime, priimek = priimek, username = username, napaka = None)
+
+    return template("index-agent.html", ime = ime, priimek = priimek, username = username, napaka = None)
+
+
+@post("/index-klub/")
+def index_klub_post():
+
+    username = request.get_cookie('username', secret = secret)
+    cur.execute('''
+                    SELECT * FROM uporabnik WHERE uporabnisko_ime=%s
+                    ''', [username])
+    tmp = cur.fetchone()
+    ID = tmp[0]
+    cur.execute(''' SELECT * FROM klub WHERE ID = %s''', [ID])
+    podatki = cur.fetchone()
+    ime = podatki[1]
+    naslov = podatki[2]
+    return template("index-klub.html", ime = ime, naslov = naslov, username = username, napaka = None)
+    
+    poizvedba = request.forms.get('search')
+    if is_int(poizvedba):
+        cur.execute('''SELECT * FROM igralci WHERE id = %s''', [poizvedba])
+        rezultat_poizvedbe_igralec = cur.fetchone()
+        cur.execute('''SELECT * FROM agent WHERE id = %s''', [poizvedba])
+        rezultat_poizvedbe_agent = cur.fetchone()
+        cur.execute('''SELECT * FROM klub WHERE id = %s''', [poizvedba])
+        rezultat_poizvedbe_klub = cur.fetchone()
+
+        rezultat_poizvedbe = [rezultat_poizvedbe_igralec, rezultat_poizvedbe_agent, rezultat_poizvedbe_klub]
+        if rezultat_poizvedbe == [None, None, None]:
+            return template("index-klub.html", ime = ime, naslov = naslov, username = username,
+                            napaka = "Uporabnik z iskanim ID ne obstaja!")
+        else:
+            return template("index-klub.html", ime = ime, naslov = naslov, username = username, napaka = None)
+        
+    elif isinstance(poizvedba, str):
+        #Zaenkrat je treba ime napisati točno tako kot je v bazi, drugače ne njade, da se spremeniti s tem,
+        #da bi pretvoril niz iz poizvedbe
+        cur.execute('''SELECT * FROM igralci WHERE ime = %s''', [poizvedba])
+        rezultat_poizvedbe_igralec = cur.fetchone()
+        cur.execute('''SELECT * FROM agent WHERE ime = %s''', [poizvedba])
+        rezultat_poizvedbe_agent = cur.fetchone()
+        cur.execute('''SELECT * FROM klub WHERE ime = %s''', [poizvedba])
+        rezultat_poizvedbe_klub = cur.fetchone()
+
+        rezultat_poizvedbe = [rezultat_poizvedbe_igralec, rezultat_poizvedbe_agent, rezultat_poizvedbe_klub]
+        print(rezultat_poizvedbe)
+        if rezultat_poizvedbe == [None, None, None]:
+            return template("index-klub.html", ime = ime, naslov = naslov, username = username,
+                            napaka = "Uporabnik z iskanim imenom ne obstaja!")
+        else:
+            return template("index-klub.html", ime = ime, naslov = naslov, username = username, napaka = None)
+
+    return template("index-klub.html", ime = ime, naslov = naslov, username = username, napaka = None)
+
+
 
 @get("/prestopi/")
 def prestopi_get():

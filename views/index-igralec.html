@@ -116,10 +116,15 @@
                     <div class="container-fluid">
                         <div class="header-wrap">
                             <form class="form-header" action="" method="POST">
-                                <input class="au-input au-input--xl" type="text" name="search" placeholder="Vpiši id igralca, agenta ali kluba" />
+                                <input class="au-input au-input--xl" type="text" name="search" placeholder="Vpiši ID ali ime igralca, agenta ali kluba" />
                                 <button class="au-btn--submit" type="submit">
                                     <i class="zmdi zmdi-search"></i>
                                 </button>
+                                <h5>
+                                    %if napaka is not None:
+                                        {{napaka}}
+                                    %end
+                                </h5>
                             </form>
                             <div class="header-button">
                                 <div class="noti-wrap">
