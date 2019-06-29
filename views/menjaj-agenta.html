@@ -287,17 +287,24 @@
                                     
                                 </div>
                             </div>
-                            <div class="col-sm-6 col-lg-3" style="width:70%;max-width: 70%;    flex: 0 0 100%;margin-left:auto;margin-right: auto">
-                                    <div class = "form-group">
-                                        <label style style="width:auto;display:inline-block" for = "agent">Izberi novega agenta</label>
-                                        <select name="agent_menjava" id="select" class="form-control" style="width:100%">
+                            <div class="col-sm-6 col-lg-3">
+                                <form action="#" method="post">
+                                    <div class="form-group">
+                                        <label>Izberi novega agenta</label>
+                                        <select class = "select" id = "select" type = "select" name = "select" style="width:100%">
                                             %for i in range(len(ostali_agenti)):
-                                                <option value = 1500>{{ostali_agenti[i][0]}}, {{ostali_agenti[i][1]}} {{ostali_agenti[i][2]}}</option>
+                                                <option value = {{ostali_agenti[i][0]}}>{{ostali_agenti[i][0]}}, {{ostali_agenti[i][1]}} {{ostali_agenti[i][2]}}</option>
                                             %end
                                         </select>
                                     </div>
-                                    <a button href = "menjaj-agenta.html" class = "au-btn au-btn--block au-btn--green m-b-20" type = "submit">Potrdi spremembo agenta</a button>
-                                        </div>
+                                    <button class="au-btn au-btn--block au-btn--green m-b-20" type="submit">Potrdi menjavo agenta</button>
+                                    <h5>
+                                        %if napaka is not None:
+                                        {{napaka}}
+                                        %end
+                                    </h5>
+                                </form>
+                            </div>
                                     </div>
                                 </div>
                             </div>
