@@ -23,6 +23,7 @@ def is_int(input):
     return False
   return True
 
+
 ################
 #test priklopa na bazo(ni še v redu, popraviti moram program za tabelo)
 
@@ -142,8 +143,8 @@ def do_login():
     username = request.forms.get('username')
     # Spravimo geslo v bazo
     password = request.forms.get('password')
-    print(username)
-    print(password)
+##    print(username)
+##    print(password)
     # Preverimo, ali se je uporabnik pravilno prijavil
     c = baza.cursor()
     cur.execute('''
@@ -217,9 +218,11 @@ def index_igralec_get():
     agent_ime = agent_vse[1]
     agent_priimek = agent_vse[2]
 
-    return template("index-igralec.html", klub = klub, klub_naslov = klub_naslov, ime = ime, priimek = priimek, drzava = drzava, placa = placa,
+    return template("index-igralec.html", klub = klub, klub_naslov = klub_naslov,
+                    ime = ime, priimek = priimek, drzava = drzava, placa = placa,
                     datum_rojstva = datum_rojstva, vrednost = vrednost,
-                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username, napaka = None)
+                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username,
+                    ostali_agenti = None, napaka = None)
 
 @get("/index-klub/")
 def index_klub_get():
@@ -235,6 +238,56 @@ def index_klub_get():
     ime = podatki[1]
     naslov = podatki[2]
     return template("index-klub.html", ime = ime, naslov = naslov, username = username, napaka = None)
+
+@get("/index-igralec/menjaj-agenta.html")
+def index_igralec_menjaj_get():
+    username = request.get_cookie('username', secret = secret)
+    cur.execute('''
+                    SELECT * FROM uporabnik WHERE uporabnisko_ime=%s
+                    ''', [username])
+    tmp = cur.fetchone()
+    ID = tmp[0]
+    cur.execute(''' SELECT * FROM igralci WHERE ID = %s''', [ID])
+    podatki = cur.fetchone()
+    ime = podatki[1]
+    priimek = podatki[2]
+    drzava = podatki[3]
+    placa = podatki[4]
+    datum_rojstva = podatki[5]
+    vrednost = podatki[6]
+    klub_id = podatki[7]
+    agent_id = podatki[8]
+
+    cur.execute('''SELECT * FROM klub WHERE id = %s''',[klub_id])
+    klub_vse = cur.fetchone()
+    klub = klub_vse[1]
+    klub_naslov = klub_vse[2]
+
+    cur.execute('''SELECT * FROM agent WHERE id = %s''', [agent_id])
+    agent_vse = cur.fetchone()
+    agent_ime = agent_vse[1]
+    agent_priimek = agent_vse[2]
+
+    cur.execute('''SELECT * FROM agent WHERE id != %s''', [agent_id])
+    ostali_agenti = cur.fetchall()
+    izbrani_agent = request.forms.get('agent_menjava')
+    #Zakaj tu ne najde agenta? Vedno napiše None!!!
+    print(izbrani_agent)
+    if izbrani_agent is not None:
+        cur.execute('''UPDATE igralci SET agent = %s''',[izbrani_agent])
+        baza.commit()
+        return template("menjaj-agenta.html", klub = klub, klub_naslov = klub_naslov,
+                    ime = ime, priimek = priimek, drzava = drzava, placa = placa,
+                    datum_rojstva = datum_rojstva, vrednost = vrednost,
+                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username,
+                    ostali_agenti = ostali_agenti, napaka = None)
+    else:
+        return template("menjaj-agenta.html", klub = klub, klub_naslov = klub_naslov,
+                    ime = ime, priimek = priimek, drzava = drzava, placa = placa,
+                    datum_rojstva = datum_rojstva, vrednost = vrednost,
+                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username,
+                    ostali_agenti = ostali_agenti, napaka = None)
+
 
 ###POST METODE, DA PRAVILNO DELA PO VNOSU ČESARKOLI
 
@@ -266,8 +319,7 @@ def index_igralec_post():
     cur.execute('''SELECT * FROM agent WHERE id = %s''', [agent_id])
     agent_vse = cur.fetchone()
     agent_ime = agent_vse[1]
-    agent_priimek = agent_vse[2]
-    
+    agent_priimek = agent_vse[2]    
     
     #Zaenkrat lahko išče le po id-jih, lahko bi dodali, da tudi po imenih, priimkih...
     #Do crasha pride tudi, če namesto številke vnesemo niz...
@@ -285,11 +337,13 @@ def index_igralec_post():
             return template("index-igralec.html", klub = klub, klub_naslov = klub_naslov, ime = ime, priimek = priimek, drzava = drzava, placa = placa,
                     datum_rojstva = datum_rojstva, vrednost = vrednost,
                     agent_ime = agent_ime, agent_priimek = agent_priimek, username = username,
+                            ostali_agenti = ostali_agenti,
                         napaka = "Oseba z iskanim ID ne obstaja!")
         else:
             return template("index-igralec.html", klub = klub, klub_naslov = klub_naslov, ime = ime, priimek = priimek, drzava = drzava, placa = placa,
                     datum_rojstva = datum_rojstva, vrednost = vrednost,
-                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username, napaka = None)
+                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username, ostali_agenti = ostali_agenti,
+                            napaka = None)
         
     elif isinstance(poizvedba, str):
         #Zaenkrat je treba ime napisati točno tako kot je v bazi, drugače ne njade, da se spremeniti s tem,
@@ -306,16 +360,19 @@ def index_igralec_post():
         if rezultat_poizvedbe == [None, None, None]:
             return template("index-igralec.html", klub = klub, klub_naslov = klub_naslov, ime = ime, priimek = priimek, drzava = drzava, placa = placa,
                     datum_rojstva = datum_rojstva, vrednost = vrednost,
-                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username,
+                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username, ostali_agenti = ostali_agenti,
                         napaka = "Uporabnik z iskanim imenom ne obstaja!")
         else:
             return template("index-igralec.html", klub = klub, klub_naslov = klub_naslov, ime = ime, priimek = priimek, drzava = drzava, placa = placa,
                     datum_rojstva = datum_rojstva, vrednost = vrednost,
-                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username, napaka = None)
+                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username,
+                            ostali_agenti = ostali_agenti, napaka = None)
 
     return template("index-igralec.html", klub = klub, klub_naslov = klub_naslov, ime = ime, priimek = priimek, drzava = drzava, placa = placa,
                     datum_rojstva = datum_rojstva, vrednost = vrednost,
-                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username, napaka = None)
+                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username,ostali_agenti = ostali_agenti,
+                    napaka = None)
+    
 
 @post("/index-agent/")
 def index_agent_post():
@@ -360,10 +417,8 @@ def index_agent_post():
         rezultat_poizvedbe = [rezultat_poizvedbe_igralec, rezultat_poizvedbe_agent, rezultat_poizvedbe_klub]
         print(rezultat_poizvedbe)
         if rezultat_poizvedbe == [None, None, None]:
-            return template("index-igralec.html", klub = klub, klub_naslov = klub_naslov, ime = ime, priimek = priimek, drzava = drzava, placa = placa,
-                    datum_rojstva = datum_rojstva, vrednost = vrednost,
-                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username,
-                        napaka = "Uporabnik z iskanim imenom ne obstaja!")
+            return template("index-agent.html", ime = ime, priimek = priimek, username = username,
+                            napaka = "Uporabnik z iskanim imenom ne obstaja!")
         else:
             return template("index-agent.html", ime = ime, priimek = priimek, username = username, napaka = None)
 
@@ -422,6 +477,62 @@ def index_klub_post():
     return template("index-klub.html", ime = ime, naslov = naslov, username = username, napaka = None)
 
 
+@post("/index-igralec/menjaj-agenta.html")
+def index_igralec_menjaj_post():
+    poizvedba = request.forms.get('search')
+    if is_int(poizvedba):
+        cur.execute('''SELECT * FROM igralci WHERE id = %s''', [poizvedba])
+        rezultat_poizvedbe_igralec = cur.fetchone()
+        cur.execute('''SELECT * FROM agent WHERE id = %s''', [poizvedba])
+        rezultat_poizvedbe_agent = cur.fetchone()
+        cur.execute('''SELECT * FROM klub WHERE id = %s''', [poizvedba])
+        rezultat_poizvedbe_klub = cur.fetchone()
+
+        rezultat_poizvedbe = [rezultat_poizvedbe_igralec, rezultat_poizvedbe_agent, rezultat_poizvedbe_klub]
+        if rezultat_poizvedbe == [None, None, None]:
+            return template("menjaj-agenta.html", klub = klub, klub_naslov = klub_naslov,
+                    ime = ime, priimek = priimek, drzava = drzava, placa = placa,
+                    datum_rojstva = datum_rojstva, vrednost = vrednost,
+                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username,
+                    ostali_agenti = ostali_agenti, napaka = "Uporabnik z iskanim ID ne obstaja!")
+        else:
+            return template("menjaj-agenta.html", klub = klub, klub_naslov = klub_naslov,
+                    ime = ime, priimek = priimek, drzava = drzava, placa = placa,
+                    datum_rojstva = datum_rojstva, vrednost = vrednost,
+                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username,
+                    ostali_agenti = ostali_agenti, napaka = None)
+        
+    elif isinstance(poizvedba, str):
+        #Zaenkrat je treba ime napisati točno tako kot je v bazi, drugače ne njade, da se spremeniti s tem,
+        #da bi pretvoril niz iz poizvedbe
+        cur.execute('''SELECT * FROM igralci WHERE ime = %s''', [poizvedba])
+        rezultat_poizvedbe_igralec = cur.fetchone()
+        cur.execute('''SELECT * FROM agent WHERE ime = %s''', [poizvedba])
+        rezultat_poizvedbe_agent = cur.fetchone()
+        cur.execute('''SELECT * FROM klub WHERE ime = %s''', [poizvedba])
+        rezultat_poizvedbe_klub = cur.fetchone()
+
+        rezultat_poizvedbe = [rezultat_poizvedbe_igralec, rezultat_poizvedbe_agent, rezultat_poizvedbe_klub]
+        print(rezultat_poizvedbe)
+        if rezultat_poizvedbe == [None, None, None]:
+            return template("menjaj-agenta.html", klub = klub, klub_naslov = klub_naslov,
+                    ime = ime, priimek = priimek, drzava = drzava, placa = placa,
+                    datum_rojstva = datum_rojstva, vrednost = vrednost,
+                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username,
+                    ostali_agenti = ostali_agenti, napaka = "Uporabnik z iskanim imenom ne obstaja!")
+        else:
+            return template("menjaj-agenta.html", klub = klub, klub_naslov = klub_naslov,
+                    ime = ime, priimek = priimek, drzava = drzava, placa = placa,
+                    datum_rojstva = datum_rojstva, vrednost = vrednost,
+                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username,
+                    ostali_agenti = ostali_agenti, napaka = None)
+
+    return template("menjaj-agenta.html", klub = klub, klub_naslov = klub_naslov,
+                    ime = ime, priimek = priimek, drzava = drzava, placa = placa,
+                    datum_rojstva = datum_rojstva, vrednost = vrednost,
+                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username,
+                    ostali_agenti = ostali_agenti, napaka = None)
+
 
 @get("/prestopi/")
 def prestopi_get():
@@ -439,54 +550,42 @@ def register_get():
 
 @post("/register/", method = 'post')
 def nov_zahtevek():
-    vloga= request.forms.get('vloga')
+
     #Za agenta
-    if vloga == '1':
-        username = request.forms.get('username_agent')
-        ime = request.forms.get('ime_agent')
-        priimek = request.forms.get('priimek_agent')
-        
-        email = request.forms.get('email_agent')
+    username = request.forms.get('username')
+    ime = request.forms.get('ime')
+    priimek = request.forms.get('priimek')
+    vloga= request.forms.get('vloga')
+    email = request.forms.get('email')
+    DatumRojstva = request.forms.get('DatumRojstva')
+    naslov = request.forms.get('naslov')
+    država = request.forms.get('država')
 
-        geslo = request.forms.get('geslo_agent')
-        geslo2 = request.forms.get('geslo2_agent')
+    geslo = request.forms.get('geslo')
+    geslo2 = request.forms.get('geslo2')
 
-    #Za igralca
-    elif vloga == '2':
-        username = request.forms.get('username_igralec')
-        ime = request.forms.get('ime_igralec')
-        priimek = request.forms.get('priimek_igralec')
-        email = request.forms.get('email_igralec')
-        DatumRojstva = str(request.forms.get('DatumRojstva_igralec'))
-        država = request.forms.get('drzava')
-        print(type(username))
-        print(type(ime))
-        print(type(priimek))
-        print(type(email))
-        print(type(DatumRojstva))
-        print(type(država))
-        print(type(str(0)))
-        print(type(str(None)))
-        geslo = request.forms.get('geslo_igralec')
-        geslo2 = request.forms.get('geslo2_igralec')
-    
     #Za klub
-    else:
-        username = request.forms.get('username_klub')
-        ime = request.forms.get('ime_klub')
-        naslov = request.forms.get('naslov_klub')
-        geslo = request.forms.get('geslo_klub')
-        geslo2 = request.forms.get('geslo2_klub')
-        
+    username_klub = request.forms.get('username_klub')
+    ime_klub = request.forms.get('ime_klub')
+    naslov_klub = request.forms.get('naslov_klub')
+##    print(vloga)
+##    print(username_klub)
+##    print(ime_klub)
+##    print(geslo)
+##    print(geslo2)
+    print(država)
+
+    
     c1 = baza.cursor()
     c1.execute("SELECT * FROM uporabnik WHERE uporabnisko_ime=%s",
               [username])
-    tmp = c1.fetchone()   
+    tmp = c1.fetchone()
+        
     if tmp is not None:
         return template("register.html", username = username, ime = ime,
                     priimek = priimek, vloga = vloga, email = email,
                     DatumRojstva = DatumRojstva, geslo = geslo, geslo2 = geslo2,
-                    država = država, napaka="Uporabniško ime je že zavzeto, izberi novega.")
+                    naslov = naslov, država = država, napaka="Uporabniško ime je že zavzeto, izberi novega.")
 
     #preverimo, ali se gesli ujemata
     if geslo != geslo2:
@@ -522,7 +621,7 @@ def nov_zahtevek():
               [id, username, geslo, 'igralec;'])
         c.execute("""INSERT INTO igralci (id, ime, priimek, država, plača, datum_rojstva, vrednost, klub, agent)
                 VALUES (%s, %s, %s, %s, %s, %s, %s) """,
-                  [id, ime, priimek, država, 0, DatumRojstva, 0, None, None])
+                  [id, ime, priimek, država, '0', DatumRojstva, '0', None, None])
         print("Uspeh!")
         return template("register.html", username = None, ime = None,
                     priimek = None, vloga = None, email = None,
@@ -542,7 +641,6 @@ def nov_zahtevek():
                     priimek = None, vloga = None, email = None,
                     starost = None, geslo = None, geslo2 = None,
                     naslov = None, napaka="Prošnja poslana uspešno!")
-
 
 @get("/logout/")
 def logout():

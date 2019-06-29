@@ -42,7 +42,7 @@
             <div class="header-mobile__bar">
                 <div class="container-fluid">
                     <div class="header-mobile-inner">
-                        <a class="logo" href="index.html">
+                        <a class="logo" href="#">
                             <img src="/static/images/icon/logo.png" alt="CoolAdmin" />
                         </a>
                         <button class="hamburger hamburger--slider" type="button">
@@ -61,7 +61,37 @@
                                 <i class="fas fa-copy"></i>Moj klub</a>
                             <ul class="navbar-mobile-sub__list list-unstyled js-sub-list">
                                 <li>
-                                    <a href="login.html">Profil kluba</a>
+                                    <a href="#">Profil kluba</a>
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <strong class="card-title mb-3">Kartica profila</strong>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mx-auto d-block">
+                                                    <img class="rounded-circle mx-auto d-block" src="/static/images/icon/circle-512.png" alt="Card image cap" style="width:100px">
+                                                    <h5 class="text-sm-center mt-2 mb-1">FC {{klub}}</h5>
+                                                    <div class="location text-sm-center">
+                                                        <i class="fa fa-map-marker"></i> {{klub_naslov}}</div>
+                                                </div>
+                                                <table style="width:100%;margin-top:10px">
+                                                    <tr>
+                                                        <td style="padding:5px;text-align: left;border: solid;">Klub</td>
+                                                        <td style="padding:5px;text-align: right;border: solid;"><div>FC {{klub}}</div>
+            
+            
+                                                    </td>
+                                                </tr>
+                                                <tr><td style="padding:5px;text-align: left;border: solid;">Vrednost</td>
+                                                    <td style="padding:5px;text-align: right;border: solid;"><div>1.000.000€</div></td>
+                                                </tr>
+                                                </table>
+                                                
+                                                <hr>
+                                                
+                                            </div>
+                                        </div>
+
+
                             </ul>
                         </li>
                         <li class="has-sub">
@@ -69,10 +99,25 @@
                                 <i class="fas fa-desktop"></i>Moj agent</a>
                             <ul class="navbar-mobile-sub__list list-unstyled js-sub-list">
                                 <li>
-                                    <a href="button.html">Profil agenta</a>
+                                    <a href="#">Profil agenta</a>
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <strong class="card-title mb-3">Kartica profila</strong>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mx-auto d-block">
+                                                    <img class="rounded-circle mx-auto d-block" src="/static/images/icon/circle-512.png" alt="Card image cap" style="width:100px">
+                                                    <h5 class="text-sm-center mt-2 mb-1">{{agent_ime}} {{agent_priimek}}</h5>
+                                                    <div class="location text-sm-center">
+                                                        <i class="fa fa-map-marker"></i> California, United States</div>
+                                                </div>                                           
+                                                <hr>
+                                                
+                                            </div>
+                                        </div>
                                 </li>
-                                <li>
-                                    <a href="badge.html"><p>Menjaj agenta</p></a>
+                                <li class = "has-sub">
+                                    <a class = "js-arrow" href="menjaj-agenta.html"><p>Menjaj agenta</p></a>
                                 </li>
                             </ul>
                         </li>
