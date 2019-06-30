@@ -197,6 +197,7 @@ def index_igralec_get():
                     ''', [username])
     tmp = cur.fetchone()
     ID = tmp[0]
+    print(ID)
     cur.execute(''' SELECT * FROM igralci WHERE ID = %s''', [ID])
     podatki = cur.fetchone()
     ime = podatki[1]
@@ -217,12 +218,22 @@ def index_igralec_get():
     agent_vse = cur.fetchone()
     agent_ime = agent_vse[1]
     agent_priimek = agent_vse[2]
+    
+  #Tukaj zbere vse ponudbe, ki so za igralca in mu pošlje obvestilo.
+    cur.execute('''SELECT * FROM prestop WHERE igralec = %s
+                    AND stanje_agent = %s AND stanje_klub = %s
+                    AND stanje_igralec = %s''', [ID, 'TRUE','TRUE','0'])
+    ponudbe = cur.fetchall()
+    print(ponudbe)
+    
+
+    
 
     return template("index-igralec.html", klub = klub, klub_naslov = klub_naslov,
                     ime = ime, priimek = priimek, drzava = drzava, placa = placa,
                     datum_rojstva = datum_rojstva, vrednost = vrednost,
                     agent_ime = agent_ime, agent_priimek = agent_priimek, username = username,
-                    ostali_agenti = None, napaka = None)
+                    napaka = None)
 
 @get("/index-klub/")
 def index_klub_get():
@@ -433,12 +444,11 @@ def index_igralec_post():
             return template("index-igralec.html", klub = klub, klub_naslov = klub_naslov, ime = ime, priimek = priimek, drzava = drzava, placa = placa,
                     datum_rojstva = datum_rojstva, vrednost = vrednost,
                     agent_ime = agent_ime, agent_priimek = agent_priimek, username = username,
-                            ostali_agenti = ostali_agenti,
                         napaka = "Oseba z iskanim ID ne obstaja!")
         else:
             return template("index-igralec.html", klub = klub, klub_naslov = klub_naslov, ime = ime, priimek = priimek, drzava = drzava, placa = placa,
                     datum_rojstva = datum_rojstva, vrednost = vrednost,
-                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username, ostali_agenti = ostali_agenti,
+                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username,
                             napaka = None)
         
     elif isinstance(poizvedba, str):
@@ -456,17 +466,16 @@ def index_igralec_post():
         if rezultat_poizvedbe == [None, None, None]:
             return template("index-igralec.html", klub = klub, klub_naslov = klub_naslov, ime = ime, priimek = priimek, drzava = drzava, placa = placa,
                     datum_rojstva = datum_rojstva, vrednost = vrednost,
-                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username, ostali_agenti = ostali_agenti,
+                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username,
                         napaka = "Uporabnik z iskanim imenom ne obstaja!")
         else:
             return template("index-igralec.html", klub = klub, klub_naslov = klub_naslov, ime = ime, priimek = priimek, drzava = drzava, placa = placa,
                     datum_rojstva = datum_rojstva, vrednost = vrednost,
-                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username,
-                            ostali_agenti = ostali_agenti, napaka = None)
+                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username, napaka = None)
 
     return template("index-igralec.html", klub = klub, klub_naslov = klub_naslov, ime = ime, priimek = priimek, drzava = drzava, placa = placa,
                     datum_rojstva = datum_rojstva, vrednost = vrednost,
-                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username,ostali_agenti = ostali_agenti,
+                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username,
                     napaka = None)
     
 
