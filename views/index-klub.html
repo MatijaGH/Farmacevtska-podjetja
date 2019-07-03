@@ -87,9 +87,17 @@
                     </ul>
                     <ul class="list-unstyled navbar__list">
                         <li class="has-sub">
-                            <a class="js-arrow" href="/form/">
-                                <i class="fas fa-balance-scale"></i>Ponudbe</a>
-                        </li>
+                            <a class="js-arrow" href="#">
+                                <i class="fas fa-balance-scale"></i>Prestopi</a>
+                            <ul class="navbar-mobile-sub__list list-unstyled js-sub-list">
+                                <li>
+                                    <a href="/form-klub/">Nakupuj igralce</a>
+                                </li>
+                                <li>
+                                    <a href="/ponudbe-zame/">Ponudbe za moje igralce</a>
+                                </li>
+                            </ul>
+                        </li>      
                     </ul>
                 </nav>
             </div>
@@ -162,13 +170,13 @@
                                         <div class="account-dropdown js-dropdown">
                                             <div class="info clearfix">
                                                 <div class="image">
-                                                    <a href="/index-agent/">
+                                                    <a href="/index-klub/">
                                                         <img src="/static/images/icon/circle-512.png" alt="John Doe" style="width:50px"/>
                                                     </a>
                                                 </div>
                                                 <div class="content">
                                                     <h5 class="name">
-                                                        <a href="/index-agent/">{{ime}}</a>
+                                                        <a href="/index-klub/">{{ime}}</a>
                                                     </h5>
                                                     <span class="email">{{username}}</span>
                                                 </div>

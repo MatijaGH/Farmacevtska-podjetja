@@ -103,13 +103,14 @@ def ustvari_tabelo_prestop():
         CREATE TABLE prestop (
 	        id SERIAL PRIMARY KEY,
 	        cena INT,
+	        placa INT,
 	        datum DATE,
 	        igralec SERIAL,
 	        iz_kluba SERIAL,
 	        v_klub SERIAL,
 	        agent SERIAL,
-		stanje_agent BOOLEAN,
-		stanje_klub BOOLEAN,
+		stanje_agent INT,
+		stanje_klub INT,
 		stanje_igralec INT,
 		renegotiable BOOLEAN,
 	        FOREIGN KEY (igralec) REFERENCES igralci (id),
@@ -275,11 +276,66 @@ def uvozi_podatke_uporabnik():
     conn.commit()
 
 
+#Dodajanje pravic
+def dodaj_pravice():
+    cur.execute("""
+        GRANT CONNECT ON DATABASE sem2019_matijagh TO javnost
+    """)
+    ## grant usage daje dostop do tabel. izjemoma za public ni potrebno, ker imajo po defaultu uporabniki CREATE and USAGE privilegije na PUBLIC shema
+    ## brez grant ostali dostopi nimajo smisla
+    ## schema je zbirka podatkovnih objektov, ki je asociirana z neko doloceno bazo
+    cur.execute("""
+        GRANT USAGE ON SCHEMA public TO javnost
+    """)
+    cur.execute("""
+        GRANT SELECT, UPDATE, INSERT ON ALL TABLES IN SCHEMA public TO javnost
+    """)
+    ## sequences za generiranje stevilk, vrednosti za kljuce, itd...
+    cur.execute("""
+        GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO javnost;
+    """)
+    conn.commit()
+
+def dodaj_pravice_matevz():
+    cur.execute("""
+        GRANT CONNECT ON DATABASE sem2019_matijagh TO matevzr
+    """)
+    cur.execute("""
+        GRANT USAGE ON SCHEMA public TO matevzr
+    """)
+    cur.execute("""
+        GRANT ALL ON ALL TABLES IN SCHEMA public TO matevzr
+    """)
+    cur.execute("""
+        GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO matevzr
+    """)
+    conn.commit()
+
+def dodaj_pravice_oskar():
+    cur.execute("""
+        GRANT CONNECT ON DATABASE sem2019_matijagh TO oskark
+    """)
+    cur.execute("""
+        GRANT USAGE ON SCHEMA public TO oskark
+    """)
+    cur.execute("""
+        GRANT ALL ON ALL TABLES IN SCHEMA public TO oskark
+    """)
+    cur.execute("""
+        GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO oskar
+    """)
+    conn.commit()
+
+dodaj_pravic_javnost()
+dodaj_pravice_matevz()
+dodaj_pravice_oskar()
 #Test, ali vse deluje, kot mora
 
 def test():
     cur.execute("select * from agent")
     print(cur.fetchall())
+
+
 
 
 pobrisi_tabelo_uporabnik()

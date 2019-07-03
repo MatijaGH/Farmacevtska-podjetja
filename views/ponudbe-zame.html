@@ -13,7 +13,7 @@
     <title>Forms</title>
 
     <!-- Fontfaces CSS-->
-    <link href=/static/css/font-face.css" rel="stylesheet" media="all">
+    <link href="/static/css/font-face.css" rel="stylesheet" media="all">
     <link href="/static/vendor/font-awesome-5/css/fontawesome-all.min.css" rel="stylesheet" media="all">
     <link href="/static/vendor/font-awesome-4.7/css/font-awesome.min.css" rel="stylesheet" media="all">
     <link href="/static/vendor/mdi-font/css/material-design-iconic-font.min.css" rel="stylesheet" media="all">
@@ -42,7 +42,7 @@
             <div class="header-mobile__bar">
                 <div class="container-fluid">
                     <div class="header-mobile-inner">
-                        <a class="logo" href="index.html">
+                        <a class="logo" href="#">
                             <img src="/static/images/icon/logo2.png" alt="CoolAdmin" />
                         </a>
                         <button class="hamburger hamburger--slider" type="button">
@@ -165,15 +165,23 @@
                 <nav class="navbar-sidebar">
                     <ul class="list-unstyled navbar__list">
                         <li class="has-sub">
-                            <a class="js-arrow" href="/index-agent/">
+                            <a class="js-arrow" href="/index-klub/">
                                 <i class="far fa-id-card"></i>Moja izkaznica</a>
                         </li>
                     </ul>
                     <ul class="list-unstyled navbar__list">
-                        <li class="active has-sub">
+                        <li class="has-sub">
                             <a class="js-arrow" href="#">
-                                <i class="fas fa-balance-scale"></i>Ponudbe</a>
-                        </li>
+                                <i class="fas fa-balance-scale"></i>Prestopi</a>
+                            <ul class="navbar-mobile-sub__list list-unstyled js-sub-list">
+                                <li>
+                                    <a href="/form-klub/">Nakupuj igralce</a>
+                                </li>
+                                <li>
+                                    <a href="/ponudbe-zame/">Ponudbe za moje igralce</a>
+                                </li>
+                            </ul>
+                        </li>      
                     </ul>
                 </nav>
             </div>
@@ -246,13 +254,13 @@
                                         <div class="account-dropdown js-dropdown">
                                             <div class="info clearfix">
                                                 <div class="image">
-                                                    <a href="/index-agent/">
+                                                    <a href="/index-klub/">
                                                         <img src="/static/images/icon/circle-512.png" alt="John Doe" style="width:50px"/>
                                                     </a>
                                                 </div>
                                                 <div class="content">
                                                     <h5 class="name">
-                                                        <a href="/index-agent/">john doe</a>
+                                                        <a href="/index-klub/">john doe</a>
                                                     </h5>
                                                     <span class="email">johndoe@example.com</span>
                                                 </div>
@@ -271,83 +279,114 @@
             </header>
             <!-- HEADER DESKTOP-->
 
-            <!-- MAIN CONTENT-->
-            <div class="main-content">
-                <div class="section__content section__content--p30">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-lg-6" style="margin:auto">
-                                <div class="card">
-                                    <div class="card-header">Specifikacija ponudbe</div>
-                                    <div class="card-body">
-                                        <div class="card-title">
-                                            <h3 class="text-center title-2">Priprava ponudbe</h3>
+           <!-- MAIN CONTENT-->
+           <div class="main-content">
+            <div class="section__content section__content--p30">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="au-card au-card--no-shadow au-card--no-pad m-b-40">
+                                <div class="au-card-title" style="background-image:url('images/bg-title-01.jpg');">
+                                    <div class="bg-overlay bg-overlay--blue"></div>
+                                    <h3>
+                                        <i class="zmdi zmdi-account-calendar"></i><p><span id="datetime"></span></p></h3>
+                                    <button class="au-btn-plus">
+                                        <a href = "/form-klub/" class="zmdi zmdi-plus"></a>
+                                    </button>
+                                </div>
+                                <div class="au-task js-list-load">
+                                    <div class="au-task__title">
+                                        <p>Ponujeni igralci</p>
+                                    </div>
+                                    <div class="au-task-list js-scrollbar3">
+                                    %for i in range(len(v_ponudbe)):
+                                    %if (v_ponudbe[i][11]):
+                                            <div class="au-task__item au-task__item--danger">
+                                            <div class="au-task__item-inner">
+                                                <h5 class="task">
+                                                     <a href="#">Ponudba a</a>
+                                                </h5>
+                                                <input class="btn btn-success" type="submit" value="Sprejmi">
+                                                <input class="btn btn-warning" type="submit" value="Pogajaj se">
+                                                <button class="btn btn-danger" type="submit" value="zavrni">Zavrni</button>
+                                                <span class="time">{{v_ponudbe[i][3]}}</span>
+                                            </div>
+                                        </div>}
+                                    %else:
+                                        <div class="au-task__item au-task__item--danger">
+                                                <div class="au-task__item-inner">
+                                                    <h5 class="task">
+                                                        <a href="#">Ponudba a</a>
+                                                    </h5>
+                                                    <input class="btn btn-success" type="submit" value="Sprejmi">
+                                                    <input class="btn btn-warning" type="submit" value="Pogajaj se" disabled=True>
+                                                    <button class="btn btn-danger" type="submit" value="zavrni">Zavrni</button>
+                                                    <span class="time">{{v_ponudbe[i][3]}}</span>
+                                                </div>
+                                            </div>}
+                                    %end
+                                    %end
+                                        <div class="au-task__item au-task__item--danger">
+                                            <div class="au-task__item-inner">
+                                                <h5 class="task">
+                                                    <a href="#">Meeting about plan for Admin Template 2018</a>
+                                                </h5>
+                                                <span class="time">10:00 AM</span>
+                                            </div>
                                         </div>
-                                        <hr>
-                                        <form action="#" method="post" novalidate="novalidate">
-                                            <div class="form-group">
-                                                        <label>Izberi igralca</label>
-                                                        <select class = "select" id = "select" type = "select" name = "select" style="width:100%">
-                                                            %for i in range(len(agentovi_igralci)):
-                                                                <option value = {{agentovi_igralci[i][0]}}>{{agentovi_igralci[i][0]}}, {{agentovi_igralci[i][1]}} {{agentovi_igralci[i][2]}}</option>
-                                                             %end
-                                                        </select>
-                                                    </div>
-                                            <div class="form-group">
-                                                <label for="cc-payment" class="control-label mb-1">Znesek nakupa</label>
-                                                <input id="cc-pament" name="cc-payment" type="number" class="form-control" aria-required="true" aria-invalid="false" value="0">
+                                        <div class="au-task__item au-task__item--warning">
+                                            <div class="au-task__item-inner">
+                                                <h5 class="task">
+                                                    <a href="#">Create new task for Dashboard</a>
+                                                </h5>
+                                                <span class="time">11:00 AM</span>
                                             </div>
-                                            <div class="form-group">
-                                                <label for="cc-payment" class="control-label mb-1">Letna plača</label>
-                                                <input id="cc-pament" name="cc-placa" type="number" class="form-control" aria-required="true" aria-invalid="false" value="0">
+                                        </div>
+                                        <div class="au-task__item au-task__item--primary">
+                                            <div class="au-task__item-inner">
+                                                <h5 class="task">
+                                                    <a href="#">Meeting about plan for Admin Template 2018</a>
+                                                </h5>
+                                                <span class="time">02:00 PM</span>
                                             </div>
-                                            <div class="form-group">
-                                                        <div class="form-group">
-                                                            <label>Izberi klub</label>
-                                                            <select class = "select" id = "izbran_klub" type = "select" name = "izbran_klub" style="width:100%">
-                                                                %for i in range(len(vsi_klubi)):
-                                                                    <option value = {{vsi_klubi[i][0]}}>{{vsi_klubi[i][0]}}, {{vsi_klubi[i][1]}} {{vsi_klubi[i][2]}}</option>
-                                                                %end
-                                                            </select>
-                                                        </div>
+                                        </div>
+                                        <div class="au-task__item au-task__item--success">
+                                            <div class="au-task__item-inner">
+                                                <h5 class="task">
+                                                    <a href="#">Create new task for Dashboard</a>
+                                                </h5>
+                                                <span class="time">03:30 PM</span>
                                             </div>
-                                            <div class="checkbox" style="margin-left: 20px;
-                                            margin-bottom: 10px;">
-                                                <label for="checkbox1" class="form-check-label ">
-                                                    <input type="checkbox" id="checkbox1" name="checkbox1" value="option1" class="form-check-input">Zadnja ponudba (označi, če je ponudba dokončna brez možnosti pogajanj)
-                                                </label>
+                                        </div>
+                                        <div class="au-task__item au-task__item--danger js-load-item">
+                                            <div class="au-task__item-inner">
+                                                <h5 class="task">
+                                                    <a href="#">Meeting about plan for Admin Template 2018</a>
+                                                </h5>
+                                                <span class="time">10:00 AM</span>
                                             </div>
-                                            <div>
-                                                <button id="payment-button" type="submit" class="btn btn-lg btn-info btn-block" style="background-color: lightgreen;
-                                                color: darkslategray;">
-                                                    <i class="fas fa-balance-scale" style="color: darkslategray;"></i>&nbsp;
-                                                    <span id="payment-button-amount">Pošlji ponudbo</span>
-                                                    <span id="payment-button-sending" style="display:none;">Pošiljam…</span>
-                                                </button>
+                                        </div>
+                                        <div class="au-task__item au-task__item--warning js-load-item">
+                                            <div class="au-task__item-inner">
+                                                <h5 class="task">
+                                                    <a href="#">Create new task for Dashboard</a>
+                                                </h5>
+                                                <span class="time">11:00 AM</span>
                                             </div>
-                                        </form>
-                                        <h5>
-                                            %if sporocilo is not None:
-                                                {{sporocilo}}
-                                            %end
-                                        </h5>
+                                        </div>
+                                    </div>
+                                    <div class="au-task__footer">
+                                        <button class="au-btn au-btn-load js-load-btn">load more</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="copyright">
-                                    <p>Copyright © 2018 Colorlib. All rights reserved. Template by <a href="https://colorlib.com">Colorlib</a>.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                        
+                        
             </div>
         </div>
-
     </div>
+    <!-- END PAGE CONTAINER-->
 
     <!-- Jquery JS-->
     <script src="/static/vendor/jquery-3.2.1.min.js"></script>
@@ -372,6 +411,11 @@
 
     <!-- Main JS-->
     <script src="/static/js/main.js"></script>
+
+    <script>
+        var dt = new Date();
+        document.getElementById("datetime").innerHTML = (("0"+dt.getDate()).slice(-2)) +"."+ (("0"+(dt.getMonth()+1)).slice(-2)) +"."+ (dt.getFullYear()) +" "+ (("0"+dt.getHours()).slice(-2)) +":"+ (("0"+dt.getMinutes()).slice(-2));
+    </script>
 
 </body>
 

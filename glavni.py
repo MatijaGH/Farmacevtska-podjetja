@@ -4,6 +4,7 @@ from bottle import *
 import psycopg2, psycopg2.extensions, psycopg2.extras
 import hashlib
 import webbrowser
+from datetime import date
 
 #priklop na bazo
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE) #da imamo lahko sumnike
@@ -22,6 +23,10 @@ def is_int(input):
   except ValueError:
     return False
   return True
+
+###Stanje 0 - oseba še ni videla ponudbe
+###Stanje 1- oseba je sprejela ponudbo
+###Stanje 2 - oseba je zavrnila ponudbo
 
 
 ################
@@ -225,6 +230,8 @@ def index_igralec_get():
                     AND stanje_igralec = %s''', [ID, 'TRUE','TRUE','0'])
     ponudbe = cur.fetchall()
     print(ponudbe)
+    cas = request.forms.get('datetime')
+    print(cas)
     
 
     
@@ -707,9 +714,159 @@ def forget_pass_get():
 @get("/form/")
 def form_get():
     """Serviraj formo za form"""
-    return template("form.html")
+    username = request.get_cookie('username', secret = secret)
+    cur.execute('''SELECT * FROM uporabnik WHERE uporabnisko_ime=%s
+                    ''', [username])
+    tmp = cur.fetchone()
+    agent_id = tmp[0]
+    cur.execute('''SELECT * FROM igralci WHERE agent=%s''',
+                                  [agent_id])
+    agentovi_igralci = cur.fetchall()
+    cur.execute('''SELECT * FROM klub''')
+    vsi_klubi = cur.fetchall()
+    ###Ni še povsem v redu, ker lahko prodaš igralca tudi že zdajšnjemu klubu.
 
+    return template("form.html", agentovi_igralci = agentovi_igralci,
+                    vsi_klubi = vsi_klubi, sporocilo = None)
 
+@post("/form/")
+def form_post():
+  
+  username = request.get_cookie('username', secret = secret)
+  cur.execute('''SELECT * FROM uporabnik WHERE uporabnisko_ime=%s
+                    ''', [username])
+  tmp = cur.fetchone()
+  agent_id = tmp[0]
+
+  cur.execute('''SELECT * FROM igralci WHERE agent=%s''',
+                                  [agent_id])
+  agentovi_igralci = cur.fetchall()
+  cur.execute('''SELECT * FROM klub''')
+  vsi_klubi = cur.fetchall()
+  "Kaj naj naredi po vnosu."
+  znesek_prestopa = request.forms.get('cc-payment')
+  placa = request.forms.get('cc-placa')
+  select = request.forms.get('select')
+  izbran_klub = request.forms.get('izbran_klub')
+  cur.execute('''SELECT klub FROM igralci WHERE id = %s''',[select])
+  iz_kluba = cur.fetchone()[0]
+  danes = date.today()
+  
+  checkbox = request.forms.get('checkbox1')
+  if checkbox == 'option1':
+    oznaka = False
+  else:
+    oznaka = True
+  
+  if is_int(placa) and is_int(znesek_prestopa):
+    None
+  else:
+    return template("form.html", agentovi_igralci = agentovi_igralci,
+                  vsi_klubi = vsi_klubi,
+                    sporocilo = 'Vnesi številsko vrednost za plačo in ceno prestopa.')
+  
+  cur.execute('''INSERT INTO prestop (cena, placa, datum, igralec,iz_kluba,
+                v_klub, agent,
+              stanje_agent, stanje_klub, stanje_igralec, renegotiable)
+              VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)''',
+              [znesek_prestopa, placa, danes,select,iz_kluba, izbran_klub,
+               agent_id, 1, 0, 0, oznaka])
+                                                                           
+  return template("form.html", agentovi_igralci = agentovi_igralci,
+                  vsi_klubi = vsi_klubi, sporocilo = 'Ponudba uspešno poslana.')
+
+@get("/form-klub/")
+def form_get():
+    """Serviraj formo za form"""
+    username = request.get_cookie('username', secret = secret)
+    cur.execute('''SELECT * FROM uporabnik WHERE uporabnisko_ime=%s
+                    ''', [username])
+    tmp = cur.fetchone()
+    klub_id = tmp[0]
+    cur.execute('''SELECT * FROM igralci WHERE klub=%s''',
+                                  [klub_id])
+    igralci_kluba = cur.fetchall()
+    cur.execute('''SELECT * FROM igralci WHERE klub != %s''',[klub_id])
+    vsi_ostali_igralci = cur.fetchall()
+
+    ###Ni še povsem v redu, ker lahko prodaš igralca tudi že zdajšnjemu klubu.
+
+    return template("form-klub.html", vsi_ostali_igralci = vsi_ostali_igralci,
+                    sporocilo = None)
+
+@post("/form-klub/")
+def form_post():
+  
+  username = request.get_cookie('username', secret = secret)
+  cur.execute('''SELECT * FROM uporabnik WHERE uporabnisko_ime=%s
+                    ''', [username])
+  tmp = cur.fetchone()
+  klub_id = tmp[0]
+
+  cur.execute('''SELECT * FROM igralci WHERE klub=%s''',
+                                  [klub_id])
+  igralci_kluba = cur.fetchall()
+  cur.execute('''SELECT * FROM igralci WHERE klub != %s''',[klub_id])
+  vsi_ostali_igralci = cur.fetchall()
+  "Kaj naj naredi po vnosu."
+  znesek_prestopa = request.forms.get('cc-payment')
+  placa = request.forms.get('cc-placa')
+  select = request.forms.get('select')
+  cur.execute('''SELECT klub FROM igralci WHERE id = %s''',[select])
+  iz_kluba = cur.fetchone()[0]
+  danes = date.today()
+  cur.execute('''SELECT agent FROM igralci WHERE id = %s''',[select])
+  agent_id = cur.fetchone()[0]
+  
+  checkbox = request.forms.get('checkbox1')
+  if checkbox == 'option1':
+    oznaka = False
+  else:
+    oznaka = True
+  
+  if is_int(placa) and is_int(znesek_prestopa):
+    None
+  else:
+    return template("form-klub.html", vsi_ostali_igralci = vsi_ostali_igralci,
+                    sporocilo = 'Vnesi številsko vrednost za plačo in ceno prestopa.')
+  
+  cur.execute('''INSERT INTO prestop (cena,placa, datum, igralec,iz_kluba,
+                v_klub, agent,
+              stanje_agent, stanje_klub, stanje_igralec, renegotiable)
+              VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)''',
+              [znesek_prestopa, placa, danes,select,iz_kluba, klub_id,
+               agent_id, 0, 1, 0, oznaka])
+                                                                           
+  return template("form-klub.html",vsi_ostali_igralci = vsi_ostali_igralci,
+                  sporocilo = 'Ponudba uspešno poslana.')
+
+@get("/ponudbe-zame/")
+def ponudbe_get():
+  username = request.get_cookie('username', secret = secret)
+  cur.execute('''SELECT * FROM uporabnik WHERE uporabnisko_ime=%s
+                    ''', [username])
+  tmp = cur.fetchone()
+  klub_id = tmp[0]
+  
+  cur.execute('''SELECT * FROM prestop WHERE v_klub = %s''',
+                          [klub_id])
+  v_ponudbe = cur.fetchall()
+  print(v_ponudbe)
+  return template("ponudbe-zame.html", v_ponudbe = v_ponudbe)
+
+@post("/ponudbe-zame/")
+def alert_get():
+  username = request.get_cookie('username', secret = secret)
+  cur.execute('''SELECT * FROM uporabnik WHERE uporabnisko_ime=%s
+                    ''', [username])
+  tmp = cur.fetchone()
+  klub_id = tmp[0]
+  
+  cur.execute('''SELECT * FROM prestop WHERE v_klub = %s''',
+                          [klub_id])
+  v_ponudbe = cur.fetchall()
+  print(v_ponudbe)
+  return template("ponudbe-zame.html", v_ponudbe = v_ponudbe)
 
 
 
