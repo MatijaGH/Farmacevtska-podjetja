@@ -783,9 +783,6 @@ def form_get():
                     ''', [username])
     tmp = cur.fetchone()
     klub_id = tmp[0]
-    cur.execute('''SELECT * FROM igralci WHERE klub=%s''',
-                                  [klub_id])
-    igralci_kluba = cur.fetchall()
     cur.execute('''SELECT * FROM igralci WHERE klub != %s''',[klub_id])
     vsi_ostali_igralci = cur.fetchall()
 
@@ -802,10 +799,6 @@ def form_post():
                     ''', [username])
   tmp = cur.fetchone()
   klub_id = tmp[0]
-
-  cur.execute('''SELECT * FROM igralci WHERE klub=%s''',
-                                  [klub_id])
-  igralci_kluba = cur.fetchall()
   cur.execute('''SELECT * FROM igralci WHERE klub != %s''',[klub_id])
   vsi_ostali_igralci = cur.fetchall()
   "Kaj naj naredi po vnosu."
@@ -848,25 +841,78 @@ def ponudbe_get():
   tmp = cur.fetchone()
   klub_id = tmp[0]
   
-  cur.execute('''SELECT * FROM prestop WHERE v_klub = %s''',
-                          [klub_id])
+  cur.execute('''SELECT * FROM prestop WHERE v_klub = %s AND stanje_klub = %s''',
+                          [klub_id, 0])
   v_ponudbe = cur.fetchall()
-  print(v_ponudbe)
-  return template("ponudbe-zame.html", v_ponudbe = v_ponudbe)
+  nogometasi = []
+
+  for igralec in v_ponudbe:
+    cur.execute('''SELECT * FROM igralci WHERE id=%s''',[igralec[4]])
+    tmp = cur.fetchone()
+    igralec_ime = tmp[1]
+    igralec_priimek = tmp[2]
+    igralec_drzava = tmp[3]
+    igralec_rojstvo = tmp[5]
+    igralec_vrednost = tmp[6]
+    nogometasi.append([igralec_ime,igralec_priimek,igralec_drzava,igralec_rojstvo,
+                      igralec_vrednost])
+  return template("ponudbe-zame.html", v_ponudbe = v_ponudbe,
+                  nogometasi = nogometasi)
 
 @post("/ponudbe-zame/")
-def alert_get():
+def ponudbe_post():
   username = request.get_cookie('username', secret = secret)
   cur.execute('''SELECT * FROM uporabnik WHERE uporabnisko_ime=%s
                     ''', [username])
   tmp = cur.fetchone()
   klub_id = tmp[0]
-  
-  cur.execute('''SELECT * FROM prestop WHERE v_klub = %s''',
-                          [klub_id])
+  cur.execute('''SELECT * FROM prestop WHERE v_klub = %s AND stanje_klub = %s''',
+                          [klub_id, 0])
   v_ponudbe = cur.fetchall()
-  print(v_ponudbe)
-  return template("ponudbe-zame.html", v_ponudbe = v_ponudbe)
+  nogometasi = []
+
+  for igralec in v_ponudbe:
+    cur.execute('''SELECT * FROM igralci WHERE id=%s''',[igralec[4]])
+    tmp = cur.fetchone()
+    igralec_ime = tmp[1]
+    igralec_priimek = tmp[2]
+    igralec_drzava = tmp[3]
+    igralec_rojstvo = tmp[5]
+    igralec_vrednost = tmp[6]
+    nogometasi.append([igralec_ime,igralec_priimek,igralec_drzava,igralec_rojstvo,
+                      igralec_vrednost])
+
+  gumb = request.forms.get('select')
+  akcija = gumb[0]
+  igralec = int(gumb[1:])
+  
+  if akcija == 's':
+    cur.execute('''UPDATE prestop SET stanje_klub = %s WHERE id = %s''',
+                [1,igralec])
+    cur.execute('''SELECT * FROM prestop WHERE v_klub = %s AND stanje_klub = %s''',
+                          [klub_id, 0])
+    v_ponudbe = cur.fetchall()
+  elif akcija == 'p':
+    cur.execute('''SELECT igralec FROM prestop WHERE id = %s''',[igralec])
+    tmp=cur.fetchone()[0]
+    cur.execute('''SELECT id, ime, priimek FROM igralci WHERE id=%s''',[tmp])
+    tmp=cur.fetchone()
+    cur.execute('''UPDATE prestop SET stanje_klub = %s WHERE id = %s''',
+                  [2,igralec])
+    cur.execute('''SELECT * FROM prestop WHERE v_klub = %s AND stanje_klub = %s''',
+                          [klub_id, 0])
+    v_ponudbe = cur.fetchall()
+    return template("form-klub.html", vsi_ostali_igralci = [tmp],
+                    sporocilo = 'Če zapustiš to stran, se bo štelo, kot da si ponudbo zavrnil.')
+    
+  else:
+    cur.execute('''UPDATE prestop SET stanje_klub = %s WHERE id = %s''',
+                  [2,igralec])
+    cur.execute('''SELECT * FROM prestop WHERE v_klub = %s AND stanje_klub = %s''',
+                          [klub_id, 0])
+    v_ponudbe = cur.fetchall()
+  return template("ponudbe-zame.html", v_ponudbe = v_ponudbe,
+                  nogometasi=nogometasi)
 
 
 

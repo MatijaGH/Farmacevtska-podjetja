@@ -304,77 +304,50 @@
                                             <div class="au-task__item au-task__item--danger">
                                             <div class="au-task__item-inner">
                                                 <h5 class="task">
-                                                     <a href="#">Ponudba a</a>
+                                                     <a href="#">Igralec: {{nogometasi[i][0]}} {{nogometasi[i][1]}}
+                                                         <div> Državljanstvo: {{nogometasi[i][2]}}</div>
+                                                         <div>Datum rojstva: {{nogometasi[i][3]}}</div>
+                                                         <div>Vrednost: {{nogometasi[i][4]}}</div>
+                                                         <div>Zahtevana plača: {{v_ponudbe[i][2]}}</div>
+                                                         <div>Znesek prestopa: {{v_ponudbe[i][1]}}</div>
+                                                        </a>
                                                 </h5>
-                                                <input class="btn btn-success" type="submit" value="Sprejmi">
-                                                <input class="btn btn-warning" type="submit" value="Pogajaj se">
-                                                <button class="btn btn-danger" type="submit" value="zavrni">Zavrni</button>
+                                                <div>
+                                                    <form action="#" method="post">
+                                                        Vaša odločitev:
+                                                        <button class="btn btn-success" name= "select", type="submit" value= s{{v_ponudbe[i][0]}}>Sprejmi</button>
+                                                        <button class="btn btn-warning" name= "select", type="submit" value=p{{v_ponudbe[i][0]}}>Pogajaj se</button>
+                                                        <button class="btn btn-danger" name= "select", type="submit" value=z{{v_ponudbe[i][0]}}>Zavrni</button>
+                                                    </form>
+                                                </div>
                                                 <span class="time">{{v_ponudbe[i][3]}}</span>
                                             </div>
-                                        </div>}
+                                        </div>
                                     %else:
                                         <div class="au-task__item au-task__item--danger">
                                                 <div class="au-task__item-inner">
                                                     <h5 class="task">
-                                                        <a href="#">Ponudba a</a>
+                                                        <a href="#">Igralec: {{nogometasi[i][0]}} {{nogometasi[i][1]}}
+                                                                <div> Državljanstvo: {{nogometasi[i][2]}}</div>
+                                                                <div>Datum rojstva: {{nogometasi[i][3]}}</div>
+                                                                <div>Vrednost: {{nogometasi[i][4]}}</div>
+                                                                <div>Zahtevana plača: {{v_ponudbe[i][2]}}</div>
+                                                                <div>Znesek prestopa: {{v_ponudbe[i][1]}}</div>
+                                                            </a>
                                                     </h5>
-                                                    <input class="btn btn-success" type="submit" value="Sprejmi">
-                                                    <input class="btn btn-warning" type="submit" value="Pogajaj se" disabled=True>
-                                                    <button class="btn btn-danger" type="submit" value="zavrni">Zavrni</button>
+                                                    <div>
+                                                        <form action="#" method="post">
+                                                            Vaša odločitev:
+                                                            <button class="btn btn-success" name= "select", type="submit" value=s{{v_ponudbe[i][0]}}>Sprejmi</button>
+                                                            <button class="btn btn-warning" name= "select", type="submit" value=p{{v_ponudbe[i][0]}} disabled>Pogajaj se</button>
+                                                            <button class="btn btn-danger" name= "select", type="submit" value=z{{v_ponudbe[i][0]}}>Zavrni</button>
+                                                        </form>
+                                                    </div>
                                                     <span class="time">{{v_ponudbe[i][3]}}</span>
                                                 </div>
-                                            </div>}
+                                            </div>
                                     %end
                                     %end
-                                        <div class="au-task__item au-task__item--danger">
-                                            <div class="au-task__item-inner">
-                                                <h5 class="task">
-                                                    <a href="#">Meeting about plan for Admin Template 2018</a>
-                                                </h5>
-                                                <span class="time">10:00 AM</span>
-                                            </div>
-                                        </div>
-                                        <div class="au-task__item au-task__item--warning">
-                                            <div class="au-task__item-inner">
-                                                <h5 class="task">
-                                                    <a href="#">Create new task for Dashboard</a>
-                                                </h5>
-                                                <span class="time">11:00 AM</span>
-                                            </div>
-                                        </div>
-                                        <div class="au-task__item au-task__item--primary">
-                                            <div class="au-task__item-inner">
-                                                <h5 class="task">
-                                                    <a href="#">Meeting about plan for Admin Template 2018</a>
-                                                </h5>
-                                                <span class="time">02:00 PM</span>
-                                            </div>
-                                        </div>
-                                        <div class="au-task__item au-task__item--success">
-                                            <div class="au-task__item-inner">
-                                                <h5 class="task">
-                                                    <a href="#">Create new task for Dashboard</a>
-                                                </h5>
-                                                <span class="time">03:30 PM</span>
-                                            </div>
-                                        </div>
-                                        <div class="au-task__item au-task__item--danger js-load-item">
-                                            <div class="au-task__item-inner">
-                                                <h5 class="task">
-                                                    <a href="#">Meeting about plan for Admin Template 2018</a>
-                                                </h5>
-                                                <span class="time">10:00 AM</span>
-                                            </div>
-                                        </div>
-                                        <div class="au-task__item au-task__item--warning js-load-item">
-                                            <div class="au-task__item-inner">
-                                                <h5 class="task">
-                                                    <a href="#">Create new task for Dashboard</a>
-                                                </h5>
-                                                <span class="time">11:00 AM</span>
-                                            </div>
-                                        </div>
-                                    </div>
                                     <div class="au-task__footer">
                                         <button class="au-btn au-btn-load js-load-btn">load more</button>
                                     </div>
