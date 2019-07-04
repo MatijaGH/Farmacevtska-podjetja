@@ -57,13 +57,21 @@
                 <div class="container-fluid">
                     <ul class="navbar-mobile__list list-unstyled">
                         <li class="has-sub">
-                            <a class="js-arrow" href="#">
+                            <a class="js-arrow" href="/index-klub/">
                                 <i class="fas fa-tachometer-alt"></i>Domov</a>
                         </li>
-                        <li>
-                            <a href="chart.html">
-                                <i class="fas fa-chart-bar"></i>Igralci</a>
-                        </li>
+                        <li class="has-sub">
+                                <a class="js-arrow" href="#">
+                                    <i class="fas fa-desktop"></i>Prestopi</a>
+                                <ul class="navbar-mobile-sub__list list-unstyled js-sub-list">
+                                    <li>
+                                        <a href="/form-klub/">Nakupuj igralce</a>
+                                    </li>
+                                    <li class = "has-sub">
+                                        <a class = "js-arrow" href="/ponudbe-zame/"><p>Ponudbe zame</p></a>
+                                    </li>
+                                </ul>
+                            </li>
                     </ul>
                 </div>
             </nav>
@@ -94,7 +102,7 @@
                                     <a href="/form-klub/">Nakupuj igralce</a>
                                 </li>
                                 <li>
-                                    <a href="/ponudbe-zame/">Ponudbe za moje igralce</a>
+                                    <a href="/ponudbe-zame/">Ponudbe zame</a>
                                 </li>
                             </ul>
                         </li>      
@@ -111,50 +119,28 @@
                 <div class="section__content section__content--p30">
                     <div class="container-fluid">
                         <div class="header-wrap">
-                            <form class="form-header" action="" method="POST">
+                            <form class="form-header" action="" method="post">
                                 <input class="au-input au-input--xl" type="text" name="search" placeholder="Išči igralce, agente, klube..." />
                                 <button class="au-btn--submit" type="submit">
                                     <i class="zmdi zmdi-search"></i>
                                 </button>
+                                <h5>
+                                    %if napaka is not None:
+                                        {{napaka}}
+                                     %end
+                                </h5>
                             </form>
                             <div class="header-button">
                                 <div class="noti-wrap">
                                     <div class="noti__item js-item-menu">
                                         <i class="zmdi zmdi-notifications"></i>
-                                        <span class="quantity">3</span>
+                                        <span class="quantity">{{stevilo_sporocil}}</span>
                                         <div class="notifi-dropdown js-dropdown">
                                             <div class="notifi__title">
-                                                <p>You have 3 Notifications</p>
-                                            </div>
-                                            <div class="notifi__item">
-                                                <div class="bg-c1 img-cir img-40">
-                                                    <i class="zmdi zmdi-email-open"></i>
-                                                </div>
-                                                <div class="content">
-                                                    <p>You got a email notification</p>
-                                                    <span class="date">April 12, 2018 06:50</span>
-                                                </div>
-                                            </div>
-                                            <div class="notifi__item">
-                                                <div class="bg-c2 img-cir img-40">
-                                                    <i class="zmdi zmdi-account-box"></i>
-                                                </div>
-                                                <div class="content">
-                                                    <p>Your account has been blocked</p>
-                                                    <span class="date">April 12, 2018 06:50</span>
-                                                </div>
-                                            </div>
-                                            <div class="notifi__item">
-                                                <div class="bg-c3 img-cir img-40">
-                                                    <i class="zmdi zmdi-file-text"></i>
-                                                </div>
-                                                <div class="content">
-                                                    <p>You got a new file</p>
-                                                    <span class="date">April 12, 2018 06:50</span>
-                                                </div>
+                                                <p>Imaš {{stevilo_sporocil}} novih ponudb</p>
                                             </div>
                                             <div class="notifi__footer">
-                                                <a href="#">All notifications</a>
+                                                <a href="/ponudbe-zame/">Vse ponudbe</a>
                                             </div>
                                         </div>
                                     </div>
@@ -200,7 +186,8 @@
             <div class="main-content">
                 <div class="section__content section__content--p30">
                     <div class="container-fluid">
-                        <div class="row m-t-25">
+                        <div class="row">
+                            <div class="col lg-6">
                                 <div class="card">
                                         <div class="card-header">
                                             <strong class="card-title mb-3">Kartica profila</strong>
@@ -221,7 +208,7 @@
                                                 </td>
                                             </tr>
                                             <tr><td style="padding:5px;text-align: left;border: solid;">Vrednost</td>
-                                                <td style="padding:5px;text-align: right;border: solid;"><div>1.000.000€</div></td>
+                                                <td style="padding:5px;text-align: right;border: solid;"><div>{{vrednost}} €</div></td>
                                             </tr>
                                             </table>
                                             
@@ -231,11 +218,75 @@
                                     </div>
                 
                                         </div>
-                                        
+                                        <div class="col-lg-6">
+                                                <div class="au-card au-card--no-shadow au-card--no-pad m-b-40">
+                                                    <div class="au-card-title" style="background-image:url('images/bg-title-01.jpg');">
+                                                        <div class="bg-overlay bg-overlay--blue"></div>
+                                                        <h3>
+                                                            <i class="zmdi zmdi-account-calendar"></i><p><span id="datetime"></span></p></h3>
+                                                    </div>
+                                                    <div class="au-task js-list-load">
+                                                        <div class="au-task__title">
+                                                            <p>Rezultati iskanja</p>
+                                                        </div>
+                                                        <div class="au-task-list js-scrollbar3">
+                                                            %for i in rezultat:
+                                                            %if i is not None:
+                                                            %for j in i:
+                                                            <div class="au-task__item au-task__item--danger">
+                                                                <div class="au-task__item-inner">
+                                                                    <h5 class="task">
+                                                                        <a href="#">
+                                                                            {{j}}
+                                                                        </a>
+                                                                    </h5>
+                                                                </div>
+                                                            </div>
+                                                            %end
+                                                            %end
+                                                            %end
+                                                        </div>
+                                                        <div class="au-task__footer">
+                                                            <button class="au-btn au-btn-load js-load-btn">Naloži več</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                    <div class="au-card au-card--no-shadow au-card--no-pad m-b-40">
+                                                        <div class="au-card-title" style="background-image:url('images/bg-title-01.jpg');">
+                                                            <div class="bg-overlay bg-overlay--blue"></div>
+                                                            <h3>
+                                                                <i class="zmdi zmdi-account-calendar"></i>Moji igralci</h3>
+                                                        </div>
+                                                        <div class="au-task js-list-load">
+                                                            <div class="au-task-list js-scrollbar3">
+                                                                    %for i in range(len(nogometasi)):
+                                                                            <div class="au-task__item au-task__item--danger">
+                                                                            <div class="au-task__item-inner">
+                                                                                <h5 class="task">
+                                                                                     <a href="#">Igralec: {{nogometasi[i][1]}} {{nogometasi[i][2]}}
+                                                                                         <div> Državljanstvo: {{nogometasi[i][3]}}</div>
+                                                                                         <div>Datum rojstva: {{nogometasi[i][5]}}</div>
+                                                                                         <div>Vrednost: {{nogometasi[i][4]}}</div>
+                                                                                        </a>
+                                                                                </h5>
+                                                                            </div>
+                                                                        </div>
+                                                                        %end
+                                                            </div>
+                                                            <div class="au-task__footer">
+                                                                <button class="au-btn au-btn-load js-load-btn">Naloži več</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>  
                                     </div>
                                 </div>
                             </div>
-                        <div class="row">
+                                
+                            </div>
+                            <div class="row">
                             <div class="col-md-12">
                                 <div class="copyright">
                                     <p>Copyright © 2018 Colorlib. All rights reserved. Template by <a href="https://colorlib.com">Colorlib</a>.</p>
@@ -274,6 +325,11 @@
 
     <!-- Main JS-->
     <script src="/static/js/main.js"></script>
+
+    <script>
+        var dt = new Date();
+        document.getElementById("datetime").innerHTML = (("0"+dt.getDate()).slice(-2)) +"."+ (("0"+(dt.getMonth()+1)).slice(-2)) +"."+ (dt.getFullYear()) +" "+ (("0"+dt.getHours()).slice(-2)) +":"+ (("0"+dt.getMinutes()).slice(-2));
+    </script>
 
 </body>
 
