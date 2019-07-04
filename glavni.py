@@ -627,6 +627,16 @@ def index_agent_post():
 @get("/prestopi/")
 def prestopi_get():
     """Serviraj formo za prestopi.html"""
+    username = request.get_cookie('username', secret = secret)
+    cur.execute('''
+                    SELECT * FROM uporabnik WHERE uporabnisko_ime=%s
+                    ''', [username])
+    tmp = cur.fetchone()
+    ID = tmp[0]
+    cur.execute(''' SELECT * FROM agent WHERE ID = %s''', [ID])
+    podatki = cur.fetchone()
+    ime = podatki[1]
+    priimek = podatki[2]
     return template("prestopi.html")
 
 @get("/register/")
@@ -762,6 +772,10 @@ def form_get():
                     ''', [username])
     tmp = cur.fetchone()
     agent_id = tmp[0]
+    cur.execute(''' SELECT * FROM agent WHERE ID = %s''', [agent_id])
+    podatki = cur.fetchone()
+    ime = podatki[1]
+    priimek = podatki[2]
     cur.execute('''SELECT * FROM igralci WHERE agent=%s''',
                                   [agent_id])
     agentovi_igralci = cur.fetchall()
