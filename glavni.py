@@ -640,31 +640,40 @@ def register_get():
 
 @post("/register/", method = 'post')
 def nov_zahtevek():
-
-    #Za agenta
-    username = request.forms.get('username')
-    ime = request.forms.get('ime')
-    priimek = request.forms.get('priimek')
     vloga= request.forms.get('vloga')
-    email = request.forms.get('email')
-    DatumRojstva = request.forms.get('DatumRojstva')
-    naslov = request.forms.get('naslov')
-    država = request.forms.get('država')
-
-    geslo = request.forms.get('geslo')
-    geslo2 = request.forms.get('geslo2')
+    #Za igralca
+    if vloga == '2':
+      username = request.forms.get('username_igralec')
+      ime = request.forms.get('ime_igralec')
+      priimek = request.forms.get('priimek_igralec')
+      email = request.forms.get('email')
+      DatumRojstva = request.forms.get('DatumRojstva_igralec')
+      država = request.forms.get('drzava')
+      geslo = request.forms.get('geslo_igralec')
+      geslo2 = request.forms.get('geslo2_igralec')
+  
+      
 
     #Za klub
-    username_klub = request.forms.get('username_klub')
-    ime_klub = request.forms.get('ime_klub')
-    naslov_klub = request.forms.get('naslov_klub')
+    elif vloga == '3':
+      username_klub = request.forms.get('username_klub')
+      ime_klub = request.forms.get('ime_klub')
+      naslov_klub = request.forms.get('naslov_klub')
+      geslo = request.forms.get('geslo_klub')
+      geslo2 = request.forms.get('geslo2_klub')
 ##    print(vloga)
 ##    print(username_klub)
 ##    print(ime_klub)
 ##    print(geslo)
 ##    print(geslo2)
-    print(država)
-
+    elif vloga == '1':
+      username = request.forms.get('username_agent')
+      ime = request.forms.get('ime_agent')
+      priimek = request.forms.get('priimek_agent')
+      email = request.forms.get('email_agent')
+      geslo = request.forms.get('geslo_agent')
+      geslo2 = request.forms.get('geslo2_agent')
+    
     
     c1 = baza.cursor()
     c1.execute("SELECT * FROM uporabnik WHERE uporabnisko_ime=%s",
@@ -710,7 +719,7 @@ def nov_zahtevek():
                 VALUES (%s, %s, %s, %s)""",
               [id, username, geslo, 'igralec;'])
         c.execute("""INSERT INTO igralci (id, ime, priimek, država, plača, datum_rojstva, vrednost, klub, agent)
-                VALUES (%s, %s, %s, %s, %s, %s, %s) """,
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) """,
                   [id, ime, priimek, država, '0', DatumRojstva, '0', None, None])
         print("Uspeh!")
         return template("register.html", username = None, ime = None,
