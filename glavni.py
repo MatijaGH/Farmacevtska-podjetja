@@ -188,10 +188,17 @@ def index_agent_get():
     tmp = cur.fetchone()
     ID = tmp[0]
     cur.execute(''' SELECT * FROM agent WHERE ID = %s''', [ID])
+    
+    
     podatki = cur.fetchone()
     ime = podatki[1]
     priimek = podatki[2]
-    return template("index-agent.html", ime = ime, priimek = priimek, username = username, napaka = None)
+
+    cur.execute('''SELECT * FROM prestop WHERE agent = %s AND stanje_klub = %s AND stanje_agent = %s''',[ID,1,0])
+    tmp2 = cur.fetchall()
+    stevilo_sporocil = len(tmp2)
+    
+    return template("index-agent.html", ime = ime, priimek = priimek, username = username, napaka = None, stevilo_sporocil=stevilo_sporocil)
 
 @get("/index-igralec/")
 def index_igralec_get():
@@ -227,7 +234,7 @@ def index_igralec_get():
   #Tukaj zbere vse ponudbe, ki so za igralca in mu pošlje obvestilo.
     cur.execute('''SELECT * FROM prestop WHERE igralec = %s
                     AND stanje_agent = %s AND stanje_klub = %s
-                    AND stanje_igralec = %s''', [ID, 'TRUE','TRUE','0'])
+                    AND stanje_igralec = %s''', [ID, '1','1','0'])
     ponudbe = cur.fetchall()
     print(ponudbe)
     cas = request.forms.get('datetime')
@@ -264,11 +271,11 @@ def index_klub_get():
     vrednost = 0
     for i in tmp:
       vrednost += i[0]
-
-    cur.execute('''SELECT * FROM igralci WHERE klub=%s''',[ID])
+    cur.execute('''SELECT * FROM igralci WHERE klub=%s ORDER BY vrednost DESC''',[ID])
     nogometasi = cur.fetchall()
+    print(nogometasi)
     return template("index-klub.html", vrednost = vrednost, stevilo_sporocil=stevilo_sporocil, ime = ime,
-                    naslov = naslov, username = username, rezultat = [None], napaka = None,
+                    naslov = naslov, username = username, rezultat = [[0,None]], napaka = None,
                     nogometasi = nogometasi)
 
 @post("/index-klub/")
@@ -293,11 +300,11 @@ def index_klub_post():
     vrednost = 0
     for i in tmp:
       vrednost += i[0]
-
-    cur.execute('''SELECT * FROM igralci WHERE klub=%s''',[ID])
-    nogometasi = cur.fetchall()
-    print(nogometasi)
     
+    cur.execute('''SELECT * FROM igralci WHERE klub=%s ORDER BY vrednost DESC''',[ID])
+    nogometasi = cur.fetchall()
+        
+          
     poizvedba = request.forms.get('search')
     if is_int(poizvedba):
         cur.execute('''SELECT * FROM igralci WHERE id = %s''', [poizvedba])
@@ -307,8 +314,8 @@ def index_klub_post():
         cur.execute('''SELECT * FROM klub WHERE id = %s''', [poizvedba])
         rezultat_poizvedbe_klub = cur.fetchall()
         
-        rezultat_poizvedbe = [rezultat_poizvedbe_igralec, rezultat_poizvedbe_agent, rezultat_poizvedbe_klub]
-        if rezultat_poizvedbe == [None, None, None]:
+        rezultat_poizvedbe = [[1,rezultat_poizvedbe_igralec], [2,rezultat_poizvedbe_agent], [3,rezultat_poizvedbe_klub]]
+        if rezultat_poizvedbe == [[1,None], [2,None], [3,None]]:
             return template("index-klub.html", vrednost = vrednost, stevilo_sporocil = stevilo_sporocil,
                             rezultat = rezultat_poizvedbe, ime = ime, naslov = naslov, username = username,
                             napaka = "Uporabnik z iskanim ID ne obstaja!",
@@ -328,12 +335,11 @@ def index_klub_post():
         cur.execute('''SELECT * FROM klub WHERE ime = %s''', [poizvedba])
         rezultat_poizvedbe_klub = cur.fetchall()
 
-        rezultat_poizvedbe = [rezultat_poizvedbe_igralec, rezultat_poizvedbe_agent, rezultat_poizvedbe_klub]
+        rezultat_poizvedbe = [[1, rezultat_poizvedbe_igralec], [2, rezultat_poizvedbe_agent], [3, rezultat_poizvedbe_klub]]
         print(rezultat_poizvedbe)
-        if rezultat_poizvedbe == [None, None, None]:
-            return template("index-klub.html", vrednost = vrednost, stevilo_sporocil = stevilo_sporocil, rezultat = rezultat_poizvedbe,
-                            ime = ime, naslov = naslov, username = username,
-                            napaka = "Uporabnik z iskanim imenom ne obstaja!",
+        if rezultat_poizvedbe == [[1,[]], [2,[]], [3,[]]]:
+                            return template("index-klub.html", vrednost = vrednost, stevilo_sporocil = stevilo_sporocil, ime = ime, rezultat = rezultat_poizvedbe,
+                            naslov = naslov, username = username, napaka = 'Ni rezultatov iskanja',
                     nogometasi = nogometasi)
         else:
             return template("index-klub.html", vrednost = vrednost, stevilo_sporocil = stevilo_sporocil, ime = ime, rezultat = rezultat_poizvedbe,
@@ -576,7 +582,7 @@ def index_igralec_post():
 
 @post("/index-agent/")
 def index_agent_post():
-
+    
     username = request.get_cookie('username', secret = secret)
     cur.execute('''
                     SELECT * FROM uporabnik WHERE uporabnisko_ime=%s
@@ -587,6 +593,10 @@ def index_agent_post():
     podatki = cur.fetchone()
     ime = podatki[1]
     priimek = podatki[2]
+
+    cur.execute('''SELECT * FROM prestop WHERE agent = %s AND stanje_klub = %s AND stanje_agent = %s''',[agent_id,1,0])
+    tmp = cur.fetchall()
+    stevilo_sporocil = len(tmp)
     
     poizvedba = request.forms.get('search')
     if is_int(poizvedba):
@@ -626,18 +636,106 @@ def index_agent_post():
 
 @get("/prestopi/")
 def prestopi_get():
-    """Serviraj formo za prestopi.html"""
-    username = request.get_cookie('username', secret = secret)
-    cur.execute('''
-                    SELECT * FROM uporabnik WHERE uporabnisko_ime=%s
+  username = request.get_cookie('username', secret = secret)
+  cur.execute('''SELECT * FROM uporabnik WHERE uporabnisko_ime=%s
                     ''', [username])
+  tmp = cur.fetchone()
+  igralec_id = tmp[0]
+  
+  cur.execute('''SELECT * FROM prestop WHERE igralec = %s AND stanje_klub = %s AND stanje_agent = %s AND stanje_igralec=%s''',
+                          [igralec_id, 1,1,0])
+  v_ponudbe = cur.fetchall()
+  nogometasi = []
+
+  cur.execute(''' SELECT * FROM igralci WHERE ID = %s''', [igralec_id])
+  podatki = cur.fetchone()
+  ime = podatki[1]
+  priimek = podatki[2]
+
+  cur.execute('''SELECT * FROM prestop WHERE igralec = %s AND stanje_klub = %s AND stanje_agent = %s AND stanje_igralec=%s''',[igralec_id,1,1,0])
+  tmp = cur.fetchall()
+  stevilo_sporocil = len(tmp)
+  
+  for v_klub in v_ponudbe:
+    cur.execute('''SELECT * FROM klub WHERE id=%s''',[v_klub[6]])
     tmp = cur.fetchone()
-    ID = tmp[0]
-    cur.execute(''' SELECT * FROM agent WHERE ID = %s''', [ID])
-    podatki = cur.fetchone()
-    ime = podatki[1]
-    priimek = podatki[2]
-    return template("prestopi.html")
+    klub_ime = tmp[1]
+    klub_naslov = tmp[2]
+    cur.execute('''SELECT vrednost FROM igralci WHERE klub=%s''',[v_klub[6]])
+    tmp2=cur.fetchall()
+    vrednost = 0
+    placa = v_klub[2]
+    cena_prestopa = v_klub[1]
+    for i in tmp2:
+      vrednost += i[0]
+    nogometasi.append([klub_ime,klub_naslov,vrednost, placa, cena_prestopa])
+  return template("prestopi.html", v_ponudbe = v_ponudbe,
+                  nogometasi = nogometasi, ime = ime, priimek = priimek, napaka = None,
+                  stevilo_sporocil = stevilo_sporocil, username = username,uspesen_prestop=None)
+
+@post("/prestopi/")
+def prestopi_post():
+  username = request.get_cookie('username', secret = secret)
+  cur.execute('''SELECT * FROM uporabnik WHERE uporabnisko_ime=%s
+                    ''', [username])
+  tmp = cur.fetchone()
+  igralec_id = tmp[0]
+  
+  cur.execute('''SELECT * FROM prestop WHERE igralec = %s AND stanje_klub = %s AND stanje_agent = %s AND stanje_igralec=%s''',
+                          [igralec_id, 1,1,0])
+  v_ponudbe = cur.fetchall()
+  nogometasi = []
+
+  cur.execute(''' SELECT * FROM igralci WHERE ID = %s''', [igralec_id])
+  podatki = cur.fetchone()
+  ime = podatki[1]
+  priimek = podatki[2]
+
+  cur.execute('''SELECT * FROM prestop WHERE igralec = %s AND stanje_klub = %s AND stanje_agent = %s AND stanje_igralec=%s''',[igralec_id,1,1,0])
+  tmp = cur.fetchall()
+  stevilo_sporocil = len(tmp)
+
+  for v_klub in v_ponudbe:
+    cur.execute('''SELECT * FROM klub WHERE id=%s''',[v_klub[6]])
+    tmp = cur.fetchone()
+    klub_ime = tmp[1]
+    klub_naslov = tmp[2]
+    cur.execute('''SELECT vrednost FROM igralci WHERE klub=%s''',[v_klub[6]])
+    tmp2=cur.fetchall()
+    vrednost = 0
+    placa = v_klub[2]
+    cena_prestopa = v_klub[1]
+    for i in tmp2:
+      vrednost += i[0]
+    nogometasi.append([klub_ime,klub_naslov,vrednost, placa, cena_prestopa])
+
+  gumb = request.forms.get('select')
+  akcija = gumb[0]
+  igralec = int(gumb[1:])
+  
+  if akcija == 's':
+    cur.execute('''UPDATE prestop SET stanje_igralec = %s WHERE id = %s''',
+                [1,igralec])
+    cur.execute('''UPDATE igralci SET klub = %s WHERE id =%s''',
+                [v_klub[6],igralec_id])
+    cur.execute('''UPDATE igralci SET plača = %s WHERE id =%s''',
+                [v_klub[2],igralec_id])
+    cur.execute('''UPDATE igralci SET vrednost = %s WHERE id =%s''',
+                [v_klub[1],igralec_id])
+    return template("prestopi.html", v_ponudbe = v_ponudbe,
+                  nogometasi = nogometasi, ime = ime, priimek = priimek, napaka = None,
+                  stevilo_sporocil = stevilo_sporocil, username = username,
+                  uspesen_prestop="Uspešno ste opravili prestop, vaša nova plača je "+str(v_klub[2])+", vaša nova vrednost pa je "+str(v_klub[1]))
+    
+  else:
+    cur.execute('''UPDATE prestop SET stanje_igralec = %s WHERE id = %s''',
+                  [2,igralec])
+    cur.execute('''SELECT * FROM prestop WHERE igralec = %s AND stanje_klub = %s AND stanje_agent =%s And stanje_igralec=%s''',
+                          [igralec_id, 1, 1,0])
+    v_ponudbe = cur.fetchall()
+    return template("prestopi.html", v_ponudbe = v_ponudbe,
+                  nogometasi = nogometasi, ime = ime, priimek = priimek, napaka = None,
+                  stevilo_sporocil = stevilo_sporocil, username = username, uspesen_prestop=None)
 
 @get("/register/")
 def register_get():
@@ -693,15 +791,12 @@ def nov_zahtevek():
     if tmp is not None:
         return template("register.html", username = username, ime = ime,
                     priimek = priimek, vloga = vloga, email = email,
-                    DatumRojstva = DatumRojstva, geslo = geslo, geslo2 = geslo2,
-                    naslov = naslov, država = država, napaka="Uporabniško ime je že zavzeto, izberi novega.")
+                    geslo = geslo, geslo2 = geslo2, napaka="Uporabniško ime je že zavzeto, izberi novega.")
 
     #preverimo, ali se gesli ujemata
     if geslo != geslo2:
         return template("register.html", username = username, ime = ime,
-                    priimek = priimek, vloga = vloga, email = email,
-                    DatumRojstva = DatumRojstva, geslo = geslo, geslo2 = geslo2,
-                    naslov = naslov, država = država, napaka="Gesli se ne ujemata!")
+                    priimek = priimek, vloga = vloga, email = email, napaka="Gesli se ne ujemata!")
 
 
     #ce pridemo, do sem, je vse uredu in lahko vnesemo zahtevek v bazo
@@ -775,6 +870,7 @@ def form_get():
     cur.execute(''' SELECT * FROM agent WHERE ID = %s''', [agent_id])
     podatki = cur.fetchone()
     ime = podatki[1]
+    print(ime)
     priimek = podatki[2]
     cur.execute('''SELECT * FROM igralci WHERE agent=%s''',
                                   [agent_id])
@@ -783,7 +879,7 @@ def form_get():
     vsi_klubi = cur.fetchall()
     ###Ni še povsem v redu, ker lahko prodaš igralca tudi že zdajšnjemu klubu.
 
-    return template("form.html", agentovi_igralci = agentovi_igralci,
+    return template("form.html", username=username, ime=ime, priimek=priimek,agentovi_igralci = agentovi_igralci,
                     vsi_klubi = vsi_klubi, sporocilo = None)
 
 @post("/form/")
@@ -794,6 +890,11 @@ def form_post():
                     ''', [username])
   tmp = cur.fetchone()
   agent_id = tmp[0]
+  cur.execute(''' SELECT * FROM agent WHERE ID = %s''', [agent_id])
+  podatki = cur.fetchone()
+  ime = podatki[1]
+  print(ime)
+  priimek = podatki[2]
 
   cur.execute('''SELECT * FROM igralci WHERE agent=%s''',
                                   [agent_id])
@@ -807,30 +908,36 @@ def form_post():
   izbran_klub = request.forms.get('izbran_klub')
   cur.execute('''SELECT klub FROM igralci WHERE id = %s''',[select])
   iz_kluba = cur.fetchone()[0]
-  danes = date.today()
-  
-  checkbox = request.forms.get('checkbox1')
-  if checkbox == 'option1':
-    oznaka = False
-  else:
-    oznaka = True
-  
-  if is_int(placa) and is_int(znesek_prestopa):
-    None
-  else:
-    return template("form.html", agentovi_igralci = agentovi_igralci,
+  print(iz_kluba == izbran_klub)
+  if iz_kluba == int(izbran_klub):
+    return template("form.html",  username=username, ime=ime, priimek=priimek,agentovi_igralci = agentovi_igralci,
                   vsi_klubi = vsi_klubi,
-                    sporocilo = 'Vnesi številsko vrednost za plačo in ceno prestopa.')
+                    sporocilo = 'Igralec je že v tem klubu.')
+  else:
+    danes = date.today()
   
-  cur.execute('''INSERT INTO prestop (cena, placa, datum, igralec,iz_kluba,
+    checkbox = request.forms.get('checkbox1')
+    if checkbox == 'option1':
+      oznaka = False
+    else:
+      oznaka = True
+  
+    if is_int(placa) and is_int(znesek_prestopa) and int(placa) > 0 and int(znesek_prestopa) > 1000:
+      cur.execute('''INSERT INTO prestop (cena, placa, datum, igralec,iz_kluba,
                 v_klub, agent,
               stanje_agent, stanje_klub, stanje_igralec, renegotiable)
               VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)''',
               [znesek_prestopa, placa, danes,select,iz_kluba, izbran_klub,
                agent_id, 1, 0, 0, oznaka])
                                                                            
-  return template("form.html", agentovi_igralci = agentovi_igralci,
+      return template("form.html",  username=username, ime=ime, priimek=priimek,agentovi_igralci = agentovi_igralci,
                   vsi_klubi = vsi_klubi, sporocilo = 'Ponudba uspešno poslana.')
+    else:
+      return template("form.html",  username=username, ime=ime, priimek=priimek,agentovi_igralci = agentovi_igralci,
+                   vsi_klubi = vsi_klubi,
+                    sporocilo = 'Podatki niso pravilni, vnesite številsko vrednost, cena mora biti večja od 1000, placa pa vecja od 0.')
+  
+    
 
 @get("/form-klub/")
 def form_get():
@@ -1018,6 +1125,109 @@ def ponudbe_post():
                   nogometasi=nogometasi, ime = ime, naslov = naslov, stevilo_sporocil = stevilo_sporocil,
                   napaka = None, username = username)
 
+@get("/ponudba-zame-agent/")
+def ponudbe_agent_get():
+  username = request.get_cookie('username', secret = secret)
+  cur.execute('''SELECT * FROM uporabnik WHERE uporabnisko_ime=%s
+                    ''', [username])
+  tmp = cur.fetchone()
+  agent_id = tmp[0]
+  print(agent_id)
+  
+  cur.execute('''SELECT * FROM prestop WHERE agent = %s AND stanje_agent = %s''',
+                          [agent_id, 0])
+  v_ponudbe = cur.fetchall()
+  print(v_ponudbe)
+  nogometasi = []
+
+  cur.execute(''' SELECT * FROM agent WHERE ID = %s''', [agent_id])
+  podatki = cur.fetchone()
+  print(podatki)
+  ime = podatki[1]
+  priimek = podatki[2]
+
+  cur.execute('''SELECT * FROM prestop WHERE agent = %s AND stanje_agent = %s''',[agent_id,0])
+  tmp = cur.fetchall()
+  stevilo_sporocil = len(tmp)
+
+  for igralec in v_ponudbe:
+    cur.execute('''SELECT * FROM igralci WHERE id=%s''',[igralec[4]])
+    tmp = cur.fetchone()
+    igralec_ime = tmp[1]
+    igralec_priimek = tmp[2]
+    igralec_drzava = tmp[3]
+    igralec_rojstvo = tmp[5]
+    igralec_vrednost = tmp[6]
+    nogometasi.append([igralec_ime,igralec_priimek,igralec_drzava,igralec_rojstvo,
+                      igralec_vrednost])
+  return template("ponudba-zame-agent.html", v_ponudbe = v_ponudbe,
+                  nogometasi = nogometasi, ime = ime, priimek = priimek, napaka = None,
+                  stevilo_sporocil = stevilo_sporocil, username = username)
+@post("/ponudba-zame-agent/")
+def ponudbe_agent_post():
+  username = request.get_cookie('username', secret = secret)
+  cur.execute('''SELECT * FROM uporabnik WHERE uporabnisko_ime=%s
+                    ''', [username])
+  tmp = cur.fetchone()
+  agent_id = tmp[0]
+  cur.execute('''SELECT * FROM prestop WHERE agent = %s AND stanje_agent = %s''',
+                          [agent_id, 0])
+  v_ponudbe = cur.fetchall()
+  nogometasi = []
 
 
+  cur.execute(''' SELECT * FROM agent WHERE ID = %s''', [agent_id])
+  podatki = cur.fetchone()
+  ime = podatki[1]
+  priimek = podatki[2]
+
+  cur.execute('''SELECT * FROM prestop WHERE agent = %s AND stanje_agent = %s''',[agent_id,0])
+  tmp = cur.fetchall()
+  stevilo_sporocil = len(tmp)
+
+  for igralec in v_ponudbe:
+    cur.execute('''SELECT * FROM igralci WHERE id=%s''',[igralec[4]])
+    tmp = cur.fetchone()
+    igralec_ime = tmp[1]
+    igralec_priimek = tmp[2]
+    igralec_drzava = tmp[3]
+    igralec_rojstvo = tmp[5]
+    igralec_vrednost = tmp[6]
+    nogometasi.append([igralec_ime,igralec_priimek,igralec_drzava,igralec_rojstvo,
+                      igralec_vrednost])
+
+  gumb = request.forms.get('select')
+  akcija = gumb[0]
+  igralec = int(gumb[1:])
+  
+  if akcija == 's':
+    cur.execute('''UPDATE prestop SET stanje_agent = %s WHERE id = %s''',
+                [1,igralec])
+    cur.execute('''SELECT * FROM prestop WHERE agent = %s AND stanje_agent = %s''',
+                          [agent_id, 0])
+    v_ponudbe = cur.fetchall()
+  elif akcija == 'p':
+    cur.execute('''SELECT igralec FROM prestop WHERE id = %s''',[igralec])
+    tmp=cur.fetchone()[0]
+    cur.execute('''SELECT id, ime, priimek FROM igralci WHERE id=%s''',[tmp])
+    tmp=cur.fetchone()
+    cur.execute('''UPDATE prestop SET stanje_agent = %s WHERE id = %s''',
+                  [2,igralec])
+    cur.execute('''SELECT * FROM prestop WHERE agent = %s AND stanje_agent = %s''',
+                          [agent_id, 0])
+    v_ponudbe = cur.fetchall()
+    return template("form-klub.html", vsi_ostali_igralci = [tmp],
+                    sporocilo = 'Če zapustiš to stran, se bo štelo, kot da si ponudbo zavrnil.',
+                    ime = ime, naslov = naslov, stevilo_sporocil = stevilo_sporocil, napaka = None,
+                    username = username)
+    
+  else:
+    cur.execute('''UPDATE prestop SET stanje_agent = %s WHERE id = %s''',
+                  [2,igralec])
+    cur.execute('''SELECT * FROM prestop WHERE agent = %s AND stanje_agent = %s''',
+                          [agent_id, 0])
+    v_ponudbe = cur.fetchall()
+  return template("ponudba-zame-agent.html", v_ponudbe = v_ponudbe,
+                  nogometasi=nogometasi, ime = ime, priimek = priimek, stevilo_sporocil = stevilo_sporocil,
+                  napaka = None, username = username)
 run(host='localhost', port=8080)

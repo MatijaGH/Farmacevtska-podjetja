@@ -119,17 +119,8 @@
         <div class="section__content section__content--p30">
             <div class="container-fluid">
                 <div class="header-wrap">
-                    <form class="form-header" action="" method="post">
-                        <input class="au-input au-input--xl" type="text" name="search" placeholder="Išči igralce, agente, klube..." />
-                        <button class="au-btn--submit" type="submit">
-                            <i class="zmdi zmdi-search"></i>
-                        </button>
-                        <h5>
-                            %if napaka is not None:
-                                {{napaka}}
-                             %end
-                        </h5>
-                    </form>
+                        <h3>
+                                <i class="zmdi zmdi-account-calendar" style="margin-right:10px"></i><span id="datetime"></span></h3>
                     <div class="header-button">
                         <div class="noti-wrap">
                             <div class="noti__item js-item-menu">
@@ -201,7 +192,7 @@
                                     <div class="au-task__title">
                                         <p>Ponujeni igralci</p>
                                     </div>
-                                    <div class="au-task-list js-scrollbar3">
+                                    <div class="au-task-list js-scrollbar3" style="height:auto">
                                     %for i in range(len(v_ponudbe)):
                                     %if (v_ponudbe[i][11]):
                                             <div class="au-task__item au-task__item--danger">
@@ -251,9 +242,6 @@
                                             </div>
                                     %end
                                     %end
-                                    <div class="au-task__footer">
-                                        <button class="au-btn au-btn-load js-load-btn">load more</button>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -290,7 +278,8 @@
 
     <script>
         var dt = new Date();
-        document.getElementById("datetime").innerHTML = (("0"+dt.getDate()).slice(-2)) +"."+ (("0"+(dt.getMonth()+1)).slice(-2)) +"."+ (dt.getFullYear()) +" "+ (("0"+dt.getHours()).slice(-2)) +":"+ (("0"+dt.getMinutes()).slice(-2));
+        datum = (("0"+dt.getDate()).slice(-2)) +"."+ (("0"+(dt.getMonth()+1)).slice(-2)) +"."+ (dt.getFullYear()) +" "+ (("0"+dt.getHours()).slice(-2)) +":"+ (("0"+dt.getMinutes()).slice(-2));
+        $( "#datetime" ).html(datum);
     </script>
 
 </body>
