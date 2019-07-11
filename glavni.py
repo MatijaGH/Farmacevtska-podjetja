@@ -221,6 +221,10 @@ def index_igralec_get():
     klub_id = podatki[7]
     agent_id = podatki[8]
 
+    cur.execute('''SELECT * FROM prestop WHERE igralec = %s AND stanje_klub = %s AND stanje_agent = %s AND stanje_igralec=%s''',[ID,1,1,0])
+    tmp = cur.fetchall()
+    stevilo_sporocil = len(tmp)
+
     cur.execute('''SELECT * FROM klub WHERE id = %s''',[klub_id])
     klub_vse = cur.fetchone()
     klub = klub_vse[1]
@@ -246,8 +250,8 @@ def index_igralec_get():
     return template("index-igralec.html", klub = klub, klub_naslov = klub_naslov,
                     ime = ime, priimek = priimek, drzava = drzava, placa = placa,
                     datum_rojstva = datum_rojstva, vrednost = vrednost,
-                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username,
-                    napaka = None)
+                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username, stevilo_sporocil=stevilo_sporocil,
+                    napaka = None, rezultat = [[0,None]])
 
 @get("/index-klub/")
 def index_klub_get():
@@ -519,6 +523,10 @@ def index_igralec_post():
     klub_id = podatki[7]
     agent_id = podatki[8]
 
+    cur.execute('''SELECT * FROM prestop WHERE igralec = %s AND stanje_klub = %s AND stanje_agent = %s AND stanje_igralec=%s''',[ID,1,1,0])
+    tmp = cur.fetchall()
+    stevilo_sporocil = len(tmp)
+
     cur.execute('''SELECT * FROM klub WHERE id = %s''',[klub_id])
     klub_vse = cur.fetchone()
     klub = klub_vse[1]
@@ -540,44 +548,44 @@ def index_igralec_post():
         cur.execute('''SELECT * FROM klub WHERE id = %s''', [poizvedba])
         rezultat_poizvedbe_klub = cur.fetchone()
 
-        rezultat_poizvedbe = [rezultat_poizvedbe_igralec, rezultat_poizvedbe_agent, rezultat_poizvedbe_klub]
-        if rezultat_poizvedbe == [None, None, None]:
+        rezultat_poizvedbe = [[1,rezultat_poizvedbe_igralec], [2,rezultat_poizvedbe_agent], [3,rezultat_poizvedbe_klub]]
+        if rezultat_poizvedbe == [[1,None], [2,None], [3,None]]:
             return template("index-igralec.html", klub = klub, klub_naslov = klub_naslov, ime = ime, priimek = priimek, drzava = drzava, placa = placa,
-                    datum_rojstva = datum_rojstva, vrednost = vrednost,
-                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username,
+                    datum_rojstva = datum_rojstva, vrednost = vrednost, rezultat = rezultat_poizvedbe,
+                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username, stevilo_sporocil=stevilo_sporocil,
                         napaka = "Oseba z iskanim ID ne obstaja!")
         else:
             return template("index-igralec.html", klub = klub, klub_naslov = klub_naslov, ime = ime, priimek = priimek, drzava = drzava, placa = placa,
                     datum_rojstva = datum_rojstva, vrednost = vrednost,
-                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username,
+                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username,stevilo_sporocil=stevilo_sporocil,rezultat = rezultat_poizvedbe,
                             napaka = None)
         
     elif isinstance(poizvedba, str):
         #Zaenkrat je treba ime napisati točno tako kot je v bazi, drugače ne njade, da se spremeniti s tem,
         #da bi pretvoril niz iz poizvedbe
         cur.execute('''SELECT * FROM igralci WHERE ime = %s''', [poizvedba])
-        rezultat_poizvedbe_igralec = cur.fetchone()
+        rezultat_poizvedbe_igralec = cur.fetchall()
         cur.execute('''SELECT * FROM agent WHERE ime = %s''', [poizvedba])
-        rezultat_poizvedbe_agent = cur.fetchone()
+        rezultat_poizvedbe_agent = cur.fetchall()
         cur.execute('''SELECT * FROM klub WHERE ime = %s''', [poizvedba])
-        rezultat_poizvedbe_klub = cur.fetchone()
+        rezultat_poizvedbe_klub = cur.fetchall()
 
-        rezultat_poizvedbe = [rezultat_poizvedbe_igralec, rezultat_poizvedbe_agent, rezultat_poizvedbe_klub]
+        rezultat_poizvedbe = [[1, rezultat_poizvedbe_igralec], [2, rezultat_poizvedbe_agent], [3, rezultat_poizvedbe_klub]]
         print(rezultat_poizvedbe)
-        if rezultat_poizvedbe == [None, None, None]:
+        if rezultat_poizvedbe == [[1,[]], [2,[]], [3,[]]]:
             return template("index-igralec.html", klub = klub, klub_naslov = klub_naslov, ime = ime, priimek = priimek, drzava = drzava, placa = placa,
                     datum_rojstva = datum_rojstva, vrednost = vrednost,
-                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username,
-                        napaka = "Uporabnik z iskanim imenom ne obstaja!")
+                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username, stevilo_sporocil=stevilo_sporocil,
+                        napaka = "Uporabnik z iskanim imenom ne obstaja!", rezultat = rezultat_poizvedbe)
         else:
             return template("index-igralec.html", klub = klub, klub_naslov = klub_naslov, ime = ime, priimek = priimek, drzava = drzava, placa = placa,
-                    datum_rojstva = datum_rojstva, vrednost = vrednost,
-                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username, napaka = None)
+                    datum_rojstva = datum_rojstva, vrednost = vrednost,stevilo_sporocil=stevilo_sporocil,
+                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username, napaka = None, rezultat=rezultat_poizvedbe)
 
     return template("index-igralec.html", klub = klub, klub_naslov = klub_naslov, ime = ime, priimek = priimek, drzava = drzava, placa = placa,
                     datum_rojstva = datum_rojstva, vrednost = vrednost,
-                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username,
-                    napaka = None)
+                    agent_ime = agent_ime, agent_priimek = agent_priimek, username = username,stevilo_sporocil=stevilo_sporocil,
+                    napaka = None, rezultat = rezultat_poizvedbe)
     
 
 @post("/index-agent/")
